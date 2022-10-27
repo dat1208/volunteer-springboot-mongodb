@@ -37,24 +37,24 @@ public class UserService {
         System.out.println("-----");
 
         //Validate Email
-        if(userNameVal(loginForm.getUsername()) == true){
+        if( userNameVal(loginForm.getUsername()) == true){
             User user = new User();
              userRepository.findUserByEmail(loginForm.getUsername()).ifPresent(u -> {
-                user.setPassword(u.getPassword());
+                user.setPwd(u.getPwd());
              });
 
-             if(Objects.equals(user.getPassword(), loginForm.getPassword()))
+             if(Objects.equals(user.getPwd(), loginForm.getPassword()))
                return true;
              else return false;
         }
         //Else is phone number
         else if(userNameVal(loginForm.getUsername()) == false) {
             User user = new User();
-            userRepository.findUserByPhoneNumber(loginForm.getUsername()).ifPresent(u -> {
-                user.setPassword(u.getPassword());
+            userRepository.findUserByPhonenumber(loginForm.getUsername()).ifPresent(u -> {
+                user.setPwd(u.getPwd());
             });
 
-            if(Objects.equals(user.getPassword(), loginForm.getPassword()))
+            if(Objects.equals(user.getPwd(), loginForm.getPassword()))
                 return true;
             else return false;
         }

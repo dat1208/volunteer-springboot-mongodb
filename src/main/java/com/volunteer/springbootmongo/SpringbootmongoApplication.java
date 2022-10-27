@@ -18,14 +18,7 @@ public class SpringbootmongoApplication {
 	@Bean
 	CommandLineRunner runner(UserRepository repository){
 		return  args -> {
-			User user = new User("Kim","Khánh","kkneee0201hihi@gmail.com","0123123123","kimkhanh001");
 
-			repository.findUserByEmail(user.getEmail())
-					.ifPresentOrElse(u -> { System.out.println("User exist");
-
-			},()->{ repository.insert(user);
-						System.out.println("Insert Suscessful");
-					});
 		};
 	}
 }

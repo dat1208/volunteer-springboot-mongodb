@@ -6,24 +6,24 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document("USERS_TEST")
+@Document("User")
 public class User {
     @Id
     private String id;
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
     @Indexed(unique = true)
     private String email;
     @Indexed(unique = true)
-    private String phoneNumber;
-    private String password;
+    private String phonenumber;
+    private String pwd;
 
-    public User(String firstName, String lastName, String email, String phoneNumber, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public User(String firstname, String lastname, String email, String phonenumber, String pwd) {
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.password = password;
+        this.phonenumber = phonenumber;
+        this.pwd = pwd;
     }
 
     public User() {
