@@ -1,6 +1,6 @@
 package com.volunteer.springbootmongo.repository;
 
-import com.volunteer.springbootmongo.models.User;
+import com.volunteer.springbootmongo.models.data.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 public interface UserRepository

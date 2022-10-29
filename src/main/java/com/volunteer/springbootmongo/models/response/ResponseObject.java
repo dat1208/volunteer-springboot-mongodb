@@ -1,15 +1,20 @@
-package com.volunteer.springbootmongo.models;
+package com.volunteer.springbootmongo.models.response;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.http.HttpStatus;
 
 public class ResponseObject {
+    @JsonProperty("status")
     private String status;
-    private String message;
+
+    @JsonProperty("data")
     private Object data;
 
     public ResponseObject(){}
 
-    public ResponseObject(String status, String message, Object data) {
+    public ResponseObject(String status, Object data) {
         this.status = status;
-        this.message = message;
+
         this.data = data;
     }
 
@@ -19,14 +24,6 @@ public class ResponseObject {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public Object getData() {
