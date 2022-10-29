@@ -66,7 +66,7 @@ public class UserService {
 
     public boolean authAccount(LoginForm loginForm){
         //Validate Email
-        if( emailVal(loginForm.getUsername()) == true){
+        if(emailVal(loginForm.getUsername())){
             User user = new User();
              userRepository.findUserByEmail(loginForm.getUsername()).ifPresent(u -> {
                 user.setPwd(u.getPwd());
@@ -77,7 +77,7 @@ public class UserService {
              else return false;
         }
         //Else is phone number
-        else if(phoneVal(loginForm.getUsername()) == false) {
+        else if(phoneVal(loginForm.getUsername())) {
             User user = new User();
             userRepository.findUserByPhonenumber(loginForm.getUsername()).ifPresent(u -> {
                 user.setPwd(u.getPwd());
@@ -111,7 +111,7 @@ public class UserService {
             else return new ResponseObject(HttpStatus.NOT_FOUND.toString(), error);
         }
         //Else is phone number
-        else if(!phoneVal(loginForm.getUsername())) {
+        else if(phoneVal(loginForm.getUsername())) {
             User user = new User();
 
             userRepository.findUserByPhonenumber(loginForm.getUsername()).ifPresent(u -> {
