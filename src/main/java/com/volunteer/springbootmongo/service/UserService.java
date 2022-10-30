@@ -163,7 +163,7 @@ public class UserService {
            Permission_Type permission_type = permission_typeRepo.findPermission_TypeByName("User").get();
            Permission permission = new Permission(account_user.get_id().toString(),user.get_id().toString(),permission_type.get_id().toString());
            permissionRepository.insert(permission);
-           return new ResponseObject((HttpStatus.ACCEPTED.toString()),user);
+           return new ResponseObject((HttpStatus.CREATED.toString()),user);
        }
     }
 }
