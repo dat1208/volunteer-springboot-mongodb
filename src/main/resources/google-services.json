@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "231367757379",
+    "project_id": "volunteer-app-c93c9",
+    "storage_bucket": "volunteer-app-c93c9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:231367757379:android:8a59fd8a158dd072c7cef6",
+        "android_client_info": {
+          "package_name": "com.volunteer.springbootmongo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "231367757379-sn3robpdppm5jgpe1vk52e6nuvg1plti.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkSNAZ_ZTI7gDuMYVGQwYh5ePAI5q7wLc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "231367757379-sn3robpdppm5jgpe1vk52e6nuvg1plti.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

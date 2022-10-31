@@ -1,8 +1,8 @@
 package com.volunteer.springbootmongo.controller;
 
 import com.volunteer.springbootmongo.config.JwtTokenUtil;
-import com.volunteer.springbootmongo.models.JwtRequest;
-import com.volunteer.springbootmongo.models.response.JwtResponse;
+import com.volunteer.springbootmongo.models.jwt.JwtRequest;
+import com.volunteer.springbootmongo.models.jwt.JwtResponse;
 import com.volunteer.springbootmongo.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin
 public class JwtAuthenticationController {
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
