@@ -1,11 +1,8 @@
-package com.volunteer.springbootmongo.service;
+package com.volunteer.springbootmongo.service.jwt;
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import com.volunteer.springbootmongo.config.EncoderConfig;
 import com.volunteer.springbootmongo.repository.UserRepository;
+import com.volunteer.springbootmongo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +25,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         if (userService.checkUsername(username)) {
             System.err.println(passwordEncoder.encode(userService.getPassword(username)));
-            return new User(username,passwordEncoder.encode(userService.getPassword(username)),
+            return new User(username,userService.getPassword(username),
                     new ArrayList<>());
         } else {
 

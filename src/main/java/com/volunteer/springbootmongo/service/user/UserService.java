@@ -1,4 +1,4 @@
-package com.volunteer.springbootmongo.service;
+package com.volunteer.springbootmongo.service.user;
 
 import com.volunteer.springbootmongo.models.LoginForm;
 import com.volunteer.springbootmongo.models.RegisterForm;
@@ -13,6 +13,8 @@ import com.volunteer.springbootmongo.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -103,7 +105,7 @@ public class UserService {
                 user.setPhonenumber(u.getPhonenumber());
             });
 
-            if(Objects.equals(user.getPwd(), loginForm.getPassword()))
+            if(BCrypt.checkpw(loginForm.getPassword(),user.getPwd()))
             {
                 ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
                 return new ResponseObject(HttpStatus.ACCEPTED.toString(), responseUser);
@@ -122,7 +124,7 @@ public class UserService {
                 user.setPhonenumber(u.getPhonenumber());
             });
 
-            if(Objects.equals(user.getPwd(), loginForm.getPassword()))
+            if(BCrypt.checkpw(loginForm.getPassword(),user.getPwd()))
             {
                 ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
                 return new ResponseObject(HttpStatus.ACCEPTED.toString(), responseUser);
@@ -204,6 +206,8 @@ public class UserService {
         }
         else return null;
     }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     public ResponseObject register(RegisterForm registerForm){
        if(userRepository.findUserByPhonenumber(registerForm.getPhonenumber()).isPresent() && userRepository.findUserByEmail(registerForm.getEmail()).isPresent()){
            String error = "phone_number_and_email_is_exist";
@@ -226,7 +230,7 @@ public class UserService {
        } else {
 
             User user = new User(registerForm.getFirstname(), registerForm.getLastname(),
-                    registerForm.getEmail(), registerForm.getPhonenumber(), registerForm.getPassword());
+                    registerForm.getEmail(), registerForm.getPhonenumber(), passwordEncoder.encode(registerForm.getPassword()));
            userRepository.insert(user);
            Account account = new Account(user.get_id().toString(),registerForm.getType(),null);
            accountRepository.insert(account);

@@ -1,10 +1,10 @@
-package com.volunteer.springbootmongo.controller;
+package com.volunteer.springbootmongo.controller.user;
 
 import com.volunteer.springbootmongo.models.LoginForm;
 import com.volunteer.springbootmongo.models.RegisterForm;
 import com.volunteer.springbootmongo.models.data.User;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
-import com.volunteer.springbootmongo.service.UserService;
+import com.volunteer.springbootmongo.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

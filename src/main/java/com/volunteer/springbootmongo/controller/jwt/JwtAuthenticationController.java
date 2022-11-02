@@ -1,11 +1,10 @@
-package com.volunteer.springbootmongo.controller;
+package com.volunteer.springbootmongo.controller.jwt;
 
 import com.volunteer.springbootmongo.config.JwtTokenUtil;
 import com.volunteer.springbootmongo.models.jwt.JwtRequest;
 import com.volunteer.springbootmongo.models.jwt.JwtResponse;
-import com.volunteer.springbootmongo.models.response.ResponseUser;
-import com.volunteer.springbootmongo.service.JwtUserDetailsService;
-import com.volunteer.springbootmongo.service.UserService;
+import com.volunteer.springbootmongo.service.jwt.JwtUserDetailsService;
+import com.volunteer.springbootmongo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.http.HttpClient;
 
 @RestController
 @CrossOrigin

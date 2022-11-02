@@ -1,4 +1,4 @@
-package com.volunteer.springbootmongo.controller;
+package com.volunteer.springbootmongo.controller.user;
 
 
 import lombok.AllArgsConstructor;
