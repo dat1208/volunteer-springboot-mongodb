@@ -132,6 +132,78 @@ public class UserService {
         else return new ResponseObject(HttpStatus.NOT_FOUND.toString(), error);
     }
 
+    public ResponseUser authAccountJwt(LoginForm loginForm){
+        String error = "Failure";
+        //Validate Email
+        if(emailVal(loginForm.getUsername())){
+            User user = new User();
+            userRepository.findUserByEmail(loginForm.getUsername()).ifPresent(u -> {
+                user.setPwd(u.getPwd());
+                user.setFirstname(u.getFirstname());
+                user.setEmail(u.getEmail());
+                user.setLastname(u.getLastname());
+                user.setPhonenumber(u.getPhonenumber());
+            });
+
+            if(Objects.equals(user.getPwd(), loginForm.getPassword()))
+            {
+                ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
+                return new ResponseUser(responseUser);
+            }
+            else return null;
+        }
+        //Else is phone number
+        else if(phoneVal(loginForm.getUsername())) {
+            User user = new User();
+
+            userRepository.findUserByPhonenumber(loginForm.getUsername()).ifPresent(u -> {
+                user.setPwd(u.getPwd());
+                user.setFirstname(u.getFirstname());
+                user.setEmail(u.getEmail());
+                user.setLastname(u.getLastname());
+                user.setPhonenumber(u.getPhonenumber());
+            });
+
+            if(Objects.equals(user.getPwd(), loginForm.getPassword()))
+            {
+                ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
+                return new ResponseUser(responseUser);
+            }
+            else return null;
+        }
+        else return null;
+    }
+
+    public ResponseUser getUserByUsername(String userName){
+        //Validate Email
+        if(emailVal(userName)){
+            User user = new User();
+            userRepository.findUserByEmail(userName).ifPresent(u -> {
+                user.setPwd(u.getPwd());
+                user.setFirstname(u.getFirstname());
+                user.setEmail(u.getEmail());
+                user.setLastname(u.getLastname());
+                user.setPhonenumber(u.getPhonenumber());
+            });
+            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
+            return new ResponseUser(responseUser);
+        }
+        //Else is phone number
+        else if(phoneVal(userName)) {
+            User user = new User();
+
+            userRepository.findUserByPhonenumber(userName).ifPresent(u -> {
+                user.setPwd(u.getPwd());
+                user.setFirstname(u.getFirstname());
+                user.setEmail(u.getEmail());
+                user.setLastname(u.getLastname());
+                user.setPhonenumber(u.getPhonenumber());
+            });
+            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
+            return new ResponseUser(responseUser);
+        }
+        else return null;
+    }
     public ResponseObject register(RegisterForm registerForm){
        if(userRepository.findUserByPhonenumber(registerForm.getPhonenumber()).isPresent() && userRepository.findUserByEmail(registerForm.getEmail()).isPresent()){
            String error = "phone_number_and_email_is_exist";
@@ -165,5 +237,32 @@ public class UserService {
            permissionRepository.insert(permission);
            return new ResponseObject((HttpStatus.CREATED.toString()),user);
        }
+    }
+
+    public boolean checkUsername(String username){
+        if(emailVal(username)){
+            com.volunteer.springbootmongo.models.data.User user = new com.volunteer.springbootmongo.models.data.User();
+            return userRepository.findUserByEmail(username).isPresent();
+
+        }
+        //Else is phone number
+        else if(phoneVal(username)) {
+            com.volunteer.springbootmongo.models.data.User user = new com.volunteer.springbootmongo.models.data.User();
+            return userRepository.findUserByPhonenumber(username).isPresent();
+        }
+        return false;
+    }
+
+    public String getPassword(String username){
+        if(emailVal(username)){
+            com.volunteer.springbootmongo.models.data.User user = new com.volunteer.springbootmongo.models.data.User();
+            return userRepository.findUserByEmail(username).get().getPwd();
+        }
+        //Else is phone number
+        else if(phoneVal(username)) {
+            com.volunteer.springbootmongo.models.data.User user = new com.volunteer.springbootmongo.models.data.User();
+            return userRepository.findUserByPhonenumber(username).get().getPwd();
+        }
+        return null;
     }
 }

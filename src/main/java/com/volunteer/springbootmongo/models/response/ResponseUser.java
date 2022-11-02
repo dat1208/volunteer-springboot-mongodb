@@ -24,6 +24,13 @@ public class ResponseUser {
         this.phonenumber = phonenumber;
     }
 
+    public ResponseUser(ResponseUser responseUser) {
+        this.firstname = responseUser.firstname;
+        this.lastname = responseUser.lastname;
+        this.email = responseUser.email;
+        this.phonenumber = responseUser.phonenumber;
+    }
+
 
     public String getFirstname() {
         return firstname;
