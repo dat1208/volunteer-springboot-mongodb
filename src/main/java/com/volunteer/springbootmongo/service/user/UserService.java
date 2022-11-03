@@ -209,7 +209,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     public ResponseObject register(RegisterForm registerForm){
-       if(userRepository.findUserByPhonenumber(registerForm.getPhonenumber()).isPresent() && userRepository.findUserByEmail(registerForm.getEmail()).isPresent()){
+       if(userRepository.findUserByPhonenumber(registerForm.getPhonenumber()).isPresent() &&
+               userRepository.findUserByEmail(registerForm.getEmail()).isPresent()){
            String error = "phone_number_and_email_is_exist";
            return new ResponseObject((HttpStatus.FOUND.toString()),error);
        } else if (userRepository.findUserByPhonenumber(registerForm.getPhonenumber()).isPresent()){
@@ -229,15 +230,32 @@ public class UserService {
            return new ResponseObject((HttpStatus.CHECKPOINT.toString()),error);
        } else {
 
-            User user = new User(registerForm.getFirstname(), registerForm.getLastname(),
-                    registerForm.getEmail(), registerForm.getPhonenumber(), passwordEncoder.encode(registerForm.getPassword()));
+            User user = new User(
+                    registerForm.getFirstname(),
+                    registerForm.getLastname(),
+                    registerForm.getEmail(),
+                    registerForm.getPhonenumber(),
+                    passwordEncoder.encode(registerForm.getPassword()));
+
            userRepository.insert(user);
-           Account account = new Account(user.get_id().toString(),registerForm.getType(),null);
+
+           Account account = new Account(
+                   user.get_id().toString(),
+                   registerForm.getType(),
+                   null);
+
            accountRepository.insert(account);
+
            Account_User account_user = new Account_User(account.get_id().toString(),false);
            account_userRepo.insert(account_user);
+
            Permission_Type permission_type = permission_typeRepo.findPermission_TypeByName("User").get();
-           Permission permission = new Permission(account_user.get_id().toString(),user.get_id().toString(),permission_type.get_id().toString());
+
+           Permission permission = new Permission(
+                   account_user.get_id().toString(),
+                   user.get_id().toString(),
+                   permission_type.get_id().toString());
+
            permissionRepository.insert(permission);
            return new ResponseObject((HttpStatus.CREATED.toString()),user);
        }
