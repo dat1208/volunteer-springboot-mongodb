@@ -23,12 +23,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>com.google.firebase</groupId>
 			<artifactId>firebase-admin</artifactId>
 			<version>9.1.0</version>
-			<scope>runtime</scope>
 		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>

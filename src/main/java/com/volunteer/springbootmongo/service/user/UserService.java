@@ -38,6 +38,9 @@ public class UserService {
     @Autowired
     private final PermissionRepository permissionRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     //Regex validate email
     private boolean emailVal(String userName){
         String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
@@ -45,6 +48,7 @@ public class UserService {
         Matcher matcher = pattern.matcher(userName);
         return matcher.matches();
     }
+
     //Regex validate password
     //Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character
     private boolean passwordVal(String password){
@@ -53,6 +57,7 @@ public class UserService {
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();
     }
+
     //Regex validate phone number
     private boolean phoneVal(String phonenumber){
         String regex = "(84|0[3|5|7|8|9])+([0-9]{8})\\b";
@@ -206,11 +211,9 @@ public class UserService {
         }
         else return null;
     }
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
     public ResponseObject register(RegisterForm registerForm){
-       if(userRepository.findUserByPhonenumber(registerForm.getPhonenumber()).isPresent() &&
-               userRepository.findUserByEmail(registerForm.getEmail()).isPresent()){
+       if(userRepository.findUserByPhonenumber(registerForm.getPhonenumber()).isPresent() && userRepository.findUserByEmail(registerForm.getEmail()).isPresent()){
            String error = "phone_number_and_email_is_exist";
            return new ResponseObject((HttpStatus.FOUND.toString()),error);
        } else if (userRepository.findUserByPhonenumber(registerForm.getPhonenumber()).isPresent()){
@@ -230,59 +233,45 @@ public class UserService {
            return new ResponseObject((HttpStatus.CHECKPOINT.toString()),error);
        } else {
 
-            User user = new User(
-                    registerForm.getFirstname(),
-                    registerForm.getLastname(),
-                    registerForm.getEmail(),
-                    registerForm.getPhonenumber(),
-                    passwordEncoder.encode(registerForm.getPassword()));
-
-           userRepository.insert(user);
-
-           Account account = new Account(
-                   user.get_id().toString(),
-                   registerForm.getType(),
-                   null);
-
-           accountRepository.insert(account);
-
-           Account_User account_user = new Account_User(account.get_id().toString(),false);
-           account_userRepo.insert(account_user);
-
-           Permission_Type permission_type = permission_typeRepo.findPermission_TypeByName("User").get();
-
-           Permission permission = new Permission(
-                   account_user.get_id().toString(),
-                   user.get_id().toString(),
-                   permission_type.get_id().toString());
-
-           permissionRepository.insert(permission);
+            User user = new User(registerForm.getFirstname(), registerForm.getLastname(),
+                    registerForm.getEmail(), registerForm.getPhonenumber(), passwordEncoder.encode(registerForm.getPassword()));
+           insertUser(user,registerForm.getType());
            return new ResponseObject((HttpStatus.CREATED.toString()),user);
        }
     }
 
+    //Insert user with two para User,Type : Type is {single, organization}
+    public void insertUser(User user, String type){
+        userRepository.insert(user);
+        Account account = new Account(user.get_id().toString(),type,null);
+        accountRepository.insert(account);
+        Account_User account_user = new Account_User(account.get_id().toString(),false);
+        account_userRepo.insert(account_user);
+        Permission_Type permission_type = permission_typeRepo.findPermission_TypeByName("User").get();
+        Permission permission = new Permission(account_user.get_id().toString(),user.get_id().toString(),permission_type.get_id().toString());
+        permissionRepository.insert(permission);
+    }
+
+    //Check username by phone or email if exist return true else false
     public boolean checkUsername(String username){
         if(emailVal(username)){
-            com.volunteer.springbootmongo.models.data.User user = new com.volunteer.springbootmongo.models.data.User();
             return userRepository.findUserByEmail(username).isPresent();
 
         }
         //Else is phone number
         else if(phoneVal(username)) {
-            com.volunteer.springbootmongo.models.data.User user = new com.volunteer.springbootmongo.models.data.User();
             return userRepository.findUserByPhonenumber(username).isPresent();
         }
         return false;
     }
 
+    //Get password by username if not exist return null
     public String getPassword(String username){
         if(emailVal(username)){
-            com.volunteer.springbootmongo.models.data.User user = new com.volunteer.springbootmongo.models.data.User();
             return userRepository.findUserByEmail(username).get().getPwd();
         }
         //Else is phone number
         else if(phoneVal(username)) {
-            com.volunteer.springbootmongo.models.data.User user = new com.volunteer.springbootmongo.models.data.User();
             return userRepository.findUserByPhonenumber(username).get().getPwd();
         }
         return null;
