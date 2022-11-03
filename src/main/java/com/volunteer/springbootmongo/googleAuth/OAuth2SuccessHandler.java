@@ -28,25 +28,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         logger.info("Email" + oAuth2User.getAttribute("email"));
         logger.info("pic" + oAuth2User.getAttribute("picture"));
         logger.info("aud" + oAuth2User.getAttribute("aud"));
-        logger.info("azp" + oAuth2User.getAttribute("azp"));
+        logger.info("azp" + oAuth2User.getAttribute("tokenValue"));
     }
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        logger.info(authentication.getPrincipal());
         getUserInAuthentication(authentication);
         // storeUserToDB(User);
         // getAccesstoken (googleapi);
         // refreshToken
         // redirect controller
-        String index = "1";
-        switch (index) {
-            case "12":
-                break;
-
-            default:
-
-        }
-
+        response.sendRedirect("/principle");
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }

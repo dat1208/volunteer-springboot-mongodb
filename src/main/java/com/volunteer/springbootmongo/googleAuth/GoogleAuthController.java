@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -24,11 +25,14 @@ public class GoogleAuthController {
     @Autowired
     private OAuth2AuthorizedClientService authorizedClientService;
 
-    @GetMapping
+    @GetMapping("")
     public Map<String, Object> currentUserLogin(OAuth2AuthenticationToken oAuth2AuthenticationToken) {
         return oAuth2AuthenticationToken.getPrincipal().getAttributes();
     }
-
+    @GetMapping("/principle")
+    public Principal user(Principal principal) {
+        return principal;
+    }
     @GetMapping("/getGoogleAuthToken")
     public ResponseEntity<ResponseObject> getGoogleAuthToken() {
         return new ResponseEntity<>(HttpStatus.OK);
