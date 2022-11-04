@@ -64,13 +64,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests().antMatchers("/authenticate","/api/v1/users/register",
-                        "/api/v2/users/auth","/api/v1/users/auth","/api/firebase/post","/api/firebase/post/{name}").permitAll().
+                        "/api/v2/users/auth","/api/v1/users/auth","/api/firebase/post","/api/firebase/post/{name}",
+                        "/oauth2/authorization/google", "/api/v1/login/oauth2/code/google/**").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().oauth2Login().successHandler(oAuth2SuccessHandler).failureHandler(oAuth2FailureHandler);
 
         // Add a filter to validate the tokens with every request
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

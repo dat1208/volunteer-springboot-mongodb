@@ -25,8 +25,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         if (userService.checkUsername(username)) {
             System.err.println(passwordEncoder.encode(userService.getPassword(username)));
-            return new User(username,userService.getPassword(username),
-                    new ArrayList<>());
+            return new User(username,userService.getPassword(username), new ArrayList<>());
         } else {
 
             throw new UsernameNotFoundException("User not found with username: " + username);
