@@ -6,6 +6,5 @@ spring:
           google:
             clientId: 618156629757-hvsv6ur3brk3tbpabmeld87go7ln8pkn.apps.googleusercontent.com
             clientSecret: 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
-
 server:
   port: 8080

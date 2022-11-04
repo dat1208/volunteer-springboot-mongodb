@@ -1,6 +1,8 @@
 package com.volunteer.springbootmongo.googleAuth;
 
+import com.volunteer.springbootmongo.config.JwtTokenUtil;
 import com.volunteer.springbootmongo.models.data.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -30,14 +32,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         logger.info("aud" + oAuth2User.getAttribute("aud"));
         logger.info("azp" + oAuth2User.getAttribute("tokenValue"));
     }
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         getUserInAuthentication(authentication);
         // storeUserToDB(User);
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal() ;
+        String token = jwtTokenUtil.generateToken(oAuth2User.getAttribute("name").toString());
+        logger.info("This is token" + token);
         // getAccesstoken (googleapi);
         // refreshToken
         // redirect controller
-        response.sendRedirect("/principle");
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }

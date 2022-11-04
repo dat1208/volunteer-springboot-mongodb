@@ -31,10 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private EncoderConfig encoderConfig;
-    @Autowired(required=true)
-    private OAuth2SuccessHandler oAuth2SuccessHandler;
-    @Autowired(required=true)
-    private OAuth2FailureHandler oAuth2FailureHandler;
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         // configure AuthenticationManager so that it knows from where to load
@@ -55,19 +52,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Autowired
+    private OAuth2FailureHandler oAuth2FailureHandler;
+    @Autowired
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity.csrf().disable();
 
         httpSecurity.authorizeRequests()
-                .antMatchers("/authenticate/**","/api/v1/users/register","/api/v2/users/auth","/api/v1/users/auth/**", "/auth/google", "/principle").permitAll()
+                .antMatchers("/authenticate/**","/api/v1/users/register","/api/v2/users/auth","/api/v1/users/auth/**",
+
+                        "/oauth2/authorization/google", "/oauth2/**", "/principle").permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .oauth2Login()
-                .successHandler(oAuth2SuccessHandler)
-                .failureHandler(oAuth2FailureHandler);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).
+                and().oauth2Login().successHandler(oAuth2SuccessHandler).failureHandler(oAuth2FailureHandler);
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
