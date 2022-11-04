@@ -26,4 +26,5 @@ public class Posts {
         this.id = id;
         this.title = title;
     }
+    public Posts() {}
 }
