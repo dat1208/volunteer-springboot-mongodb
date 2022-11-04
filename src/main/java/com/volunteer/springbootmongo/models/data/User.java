@@ -13,11 +13,17 @@ public class User {
     private ObjectId _id;
     private String firstname;
     private String lastname;
+
+    private String avatar;
+
+    private String cover;
     @Indexed(unique = true)
     private String email;
     @Indexed(unique = true)
     private String phonenumber;
     private String pwd;
+
+
 
     public User(String firstname, String lastname, String email, String phonenumber, String pwd) {
         this.firstname = firstname;
@@ -27,10 +33,27 @@ public class User {
         this.pwd = pwd;
     }
 
+
+
     public User() {
 
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
     public ObjectId get_id() {
         return _id;
     }

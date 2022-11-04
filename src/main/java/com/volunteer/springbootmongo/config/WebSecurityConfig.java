@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -58,18 +60,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private OAuth2SuccessHandler oAuth2SuccessHandler;
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+        // We don't need CSRF for this example
+        httpSecurity.csrf().disable()
+                // dont authenticate this particular request
+                .authorizeRequests().antMatchers("/authenticate","/api/v1/users/register",
+                        "/api/v2/users/auth","/api/v1/users/auth","/api/firebase/post","/api/firebase/post/{name}").permitAll().
+                // all other requests need to be authenticated
+                        anyRequest().authenticated().and().
+                // make sure we use stateless session; session won't be used to
+                // store user's state.
+                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        httpSecurity.csrf().disable();
-
-        httpSecurity.authorizeRequests()
-                .antMatchers("/authenticate/**","/api/v1/users/register","/api/v2/users/auth","/api/v1/users/auth/**",
-
-                        "/oauth2/authorization/google", "/oauth2/**", "/principle").permitAll()
-                .anyRequest().authenticated().and()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-                and().oauth2Login().successHandler(oAuth2SuccessHandler).failureHandler(oAuth2FailureHandler);
-
+        // Add a filter to validate the tokens with every request
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }
