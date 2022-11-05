@@ -29,7 +29,13 @@
 			<artifactId>firebase-admin</artifactId>
 			<version>9.1.0</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>spring-cloud-gcp-dependencies</artifactId>
+			<version>3.0.0</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>

@@ -19,7 +19,7 @@ public class User {
     private String cover;
     @Indexed(unique = true)
     private String email;
-    @Indexed(unique = true)
+    @Indexed(unique = true, partialFilter = "{ phonenumber : { $exists : true } }")
     private String phonenumber;
     private String pwd;
 
@@ -32,8 +32,6 @@ public class User {
         this.phonenumber = phonenumber;
         this.pwd = pwd;
     }
-
-
 
     public User() {
 

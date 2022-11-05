@@ -42,7 +42,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     //Regex validate email
-    private boolean emailVal(String userName){
+    public boolean emailVal(String userName){
         String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(userName);
@@ -51,7 +51,7 @@ public class UserService {
 
     //Regex validate password
     //Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character
-    private boolean passwordVal(String password){
+    public boolean passwordVal(String password){
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
@@ -59,11 +59,17 @@ public class UserService {
     }
 
     //Regex validate phone number
-    private boolean phoneVal(String phonenumber){
+    public boolean phoneVal(String phonenumber){
         String regex = "(84|0[3|5|7|8|9])+([0-9]{8})\\b";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(phonenumber);
         return matcher.matches();
+    }
+
+    public boolean usernameVal(String username){
+        if(emailVal(username) || phoneVal(username))
+            return true;
+        else return false;
     }
 
     //Get all users from mongodb
@@ -79,7 +85,7 @@ public class UserService {
                 user.setPwd(u.getPwd());
              });
 
-             if(Objects.equals(user.getPwd(), loginForm.getPassword()))
+             if(BCrypt.checkpw(loginForm.getPassword(),user.getPwd()))
                return true;
              else return false;
         }
@@ -90,7 +96,7 @@ public class UserService {
                 user.setPwd(u.getPwd());
             });
 
-            if(Objects.equals(user.getPwd(), loginForm.getPassword()))
+            if(BCrypt.checkpw(loginForm.getPassword(),user.getPwd()))
                 return true;
             else return false;
         }
