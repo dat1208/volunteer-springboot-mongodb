@@ -19,7 +19,7 @@ public class RegisterForm {
     @Indexed(unique = true)
     private String email;
 
-    @Indexed(unique = true)
+    @Indexed(unique = true, partialFilter = "{ phonenumber : { $exists : true } }")
     private String phonenumber;
 
     private String password;

@@ -1,7 +1,9 @@
 package com.volunteer.springbootmongo.models.firebase;
 
 
+import lombok.Data;
 
+@Data
 public class Posts {
     private String id;
     private String title;
