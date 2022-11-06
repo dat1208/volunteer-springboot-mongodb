@@ -9,7 +9,7 @@ public class JwtResponse implements Serializable{
     private HttpStatus statusCode;
     private String message;
 
-    private final String jwttoken;
+    private String jwttoken;
     private ResponseUser responseUser;
 
     public boolean isSuccess() {

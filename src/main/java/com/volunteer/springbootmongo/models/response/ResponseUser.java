@@ -17,6 +17,9 @@ public class ResponseUser {
     @JsonProperty("phonenumber")
     private String phonenumber;
 
+    @JsonProperty("avatar")
+    private String avatar;
+
     public ResponseUser(String firstname, String lastname, String email, String phonenumber) {
         this.firstname = firstname;
         this.lastname = lastname;
