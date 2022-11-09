@@ -9,6 +9,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+
 @SpringBootApplication
 public class SpringbootmongoApplication {
 	public static void main(String[] args) {
@@ -19,6 +23,9 @@ public class SpringbootmongoApplication {
 	@Bean
 	CommandLineRunner runner(UserRepository repository){
 		return  args -> {
+
+			LocalDateTime date = LocalDateTime.now().minusMinutes(20);
+			System.out.println(date);
 		};
 	}
 }

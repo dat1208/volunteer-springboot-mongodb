@@ -39,12 +39,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(jwtUserDetailsService).passwordEncoder(encoderConfig.passwordEncoder());
     }
 
-
-    //@Bean
-    //public PasswordEncoder passwordEncoder() {
-       // return new BCryptPasswordEncoder();
-    //}
-
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -58,7 +52,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // dont authenticate this particular request
                 .authorizeRequests().antMatchers("/authenticate","/api/v1/users/register",
                         "/api/v2/users/auth","/api/v1/users/auth","/api/firebase/post"
-                        ,"/api/firebase/post/{name}","/api/upload/avatar").permitAll().
+                        ,"/api/firebase/post/{name}","/api/upload/avatar","/api/firebase/post/getAll",
+                        "/api/upload/cover","/api/v1/users/update").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to

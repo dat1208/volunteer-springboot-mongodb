@@ -2,6 +2,7 @@ package com.volunteer.springbootmongo.controller.user;
 
 import com.volunteer.springbootmongo.models.LoginForm;
 import com.volunteer.springbootmongo.models.RegisterForm;
+import com.volunteer.springbootmongo.models.UpdateForm;
 import com.volunteer.springbootmongo.models.data.User;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
 import com.volunteer.springbootmongo.service.user.UserService;
@@ -40,5 +41,10 @@ public class UserController {
     @PostMapping ("/v1/users/register")
     public ResponseEntity<ResponseObject> register(@RequestBody RegisterForm registerForm){
        return new ResponseEntity<>(userService.register(registerForm),HttpStatus.OK);
+    }
+
+    @PostMapping("/v1/users/update")
+    public ResponseEntity<ResponseObject> update(@RequestBody UpdateForm updateForm){
+        return new ResponseEntity<>(userService.update(updateForm),HttpStatus.OK);
     }
 }
