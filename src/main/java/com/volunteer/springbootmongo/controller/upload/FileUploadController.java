@@ -19,8 +19,13 @@ public class FileUploadController {
     UploadService uploadService;
 
     @PostMapping("/avatar")
-    public ResponseObject upload(@RequestParam("file") MultipartFile file, @RequestParam("username") String username) throws IOException {
+    public ResponseObject uploadAvatar(@RequestParam("file") MultipartFile file, @RequestParam("username") String username) throws IOException {
 
-        return uploadService.uploadImage(file,username);
+        return uploadService.uploadImage(file,username,"avatar");
+    }
+    @PostMapping("/cover")
+    public ResponseObject uploadCover(@RequestParam("file") MultipartFile file, @RequestParam("username") String username) throws IOException {
+
+        return uploadService.uploadImage(file,username,"cover");
     }
 }

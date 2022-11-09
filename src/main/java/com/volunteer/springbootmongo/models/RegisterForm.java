@@ -7,6 +7,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Data
 @Document("User")
 public class RegisterForm {
@@ -28,6 +30,15 @@ public class RegisterForm {
 
     public ObjectId get_id() {
         return _id;
+    }
+
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public void set_id(ObjectId _id) {
