@@ -15,21 +15,34 @@ public class User {
     private ObjectId _id;
     private String firstname;
     private String lastname;
-
     private Date birth;
     private boolean gender;
     private String avatar;
-
     private String cover;
     @Indexed(unique = true)
     private String email;
     @Indexed(unique = true, partialFilter = "{ phonenumber : { $exists : true } }")
     private String phonenumber;
+
+    private String address;
     private String pwd;
 
 
+    public User(ObjectId _id, String firstname, String lastname, Date birth, boolean gender, String avatar, String cover, String email, String phonenumber, String address, String pwd) {
+        this._id = _id;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.birth = birth;
+        this.gender = gender;
+        this.avatar = avatar;
+        this.cover = cover;
+        this.email = email;
+        this.phonenumber = phonenumber;
+        this.address = address;
+        this.pwd = pwd;
+    }
 
-    public User(String firstname, String lastname,String email, String phonenumber, String pwd) {
+    public User(String firstname, String lastname, String email, String phonenumber, String pwd) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
@@ -41,6 +54,29 @@ public class User {
 
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Date getBirth() {
+        return birth;
+    }
+
+    public void setBirth(Date birth) {
+        this.birth = birth;
+    }
+
+    public boolean getGender() {
+        return gender;
+    }
+
+    public void setGender(boolean gender) {
+        this.gender = gender;
+    }
     public String getAvatar() {
         return avatar;
     }

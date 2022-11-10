@@ -188,7 +188,12 @@ public class UserService {
         else return null;
     }
 
-    public ResponseUser getUserByUsername(String userName){
+    public String Gender(boolean gender){
+        if(gender == true)
+            return "male";
+        else return "female";
+    }
+    public ResponseUser getUserByUsername(String userName) throws Exception{
         //Validate Email
         if(emailVal(userName)){
             User user = new User();
@@ -198,8 +203,14 @@ public class UserService {
                 user.setEmail(u.getEmail());
                 user.setLastname(u.getLastname());
                 user.setPhonenumber(u.getPhonenumber());
+                user.setGender(u.getGender());
+                user.setAddress(u.getAddress());
+                user.setAvatar(u.getAvatar());
+                user.setCover(u.getCover());
+                user.setBirth(u.getBirth());
             });
-            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
+            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(), user.getBirth(),user.getEmail(),
+                    user.getPhonenumber(), user.getAvatar(), user.getCover(),Gender(user.getGender()),user.getAddress());
             return new ResponseUser(responseUser);
         }
         //Else is phone number
@@ -212,8 +223,14 @@ public class UserService {
                 user.setEmail(u.getEmail());
                 user.setLastname(u.getLastname());
                 user.setPhonenumber(u.getPhonenumber());
+                user.setGender(u.getGender());
+                user.setAddress(u.getAddress());
+                user.setAvatar(u.getAvatar());
+                user.setCover(u.getCover());
+                user.setBirth(u.getBirth());
             });
-            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
+            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(), user.getBirth(),user.getEmail(),
+                    user.getPhonenumber(), user.getAvatar(), user.getCover(),Gender(user.getGender()),user.getAddress());
             return new ResponseUser(responseUser);
         }
         else return null;
