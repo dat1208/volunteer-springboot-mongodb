@@ -29,7 +29,7 @@ public class GoogleAuthController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @PostMapping("/")
-    public ResponseEntity<?> receiveAccessToken(@RequestBody GoogleUser googleUser) {
+    public ResponseEntity<?> receiveUserData(@RequestBody GoogleUser googleUser) {
         System.out.println(googleUser.getEmail());
         googleAuthService.storedUser(googleUser);
         String token = jwtTokenUtil.generateToken(googleUser.getEmail());

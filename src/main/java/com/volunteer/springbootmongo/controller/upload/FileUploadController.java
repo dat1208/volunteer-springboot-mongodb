@@ -20,7 +20,6 @@ public class FileUploadController {
 
     @PostMapping("/avatar")
     public ResponseObject upload(@RequestParam("file") MultipartFile file, @RequestParam("username") String username) throws IOException {
-
         return uploadService.uploadImage(file,username);
     }
 }
