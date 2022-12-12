@@ -2,6 +2,7 @@ package com.volunteer.springbootmongo.service.user;
 
 import com.volunteer.springbootmongo.models.LoginForm;
 import com.volunteer.springbootmongo.models.RegisterForm;
+import com.volunteer.springbootmongo.models.UpdateForm;
 import com.volunteer.springbootmongo.models.data.Account;
 import com.volunteer.springbootmongo.models.data.Account_User;
 import com.volunteer.springbootmongo.models.data.Permission_Type;
@@ -187,7 +188,12 @@ public class UserService {
         else return null;
     }
 
-    public ResponseUser getUserByUsername(String userName){
+    public String Gender(boolean gender){
+        if(gender == true)
+            return "male";
+        else return "female";
+    }
+    public ResponseUser getUserByUsername(String userName) throws Exception{
         //Validate Email
         if(emailVal(userName)){
             User user = new User();
@@ -197,8 +203,14 @@ public class UserService {
                 user.setEmail(u.getEmail());
                 user.setLastname(u.getLastname());
                 user.setPhonenumber(u.getPhonenumber());
+                user.setGender(u.getGender());
+                user.setAddress(u.getAddress());
+                user.setAvatar(u.getAvatar());
+                user.setCover(u.getCover());
+                user.setBirth(u.getBirth());
             });
-            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
+            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(), user.getBirth(),user.getEmail(),
+                    user.getPhonenumber(), user.getAvatar(), user.getCover(),Gender(user.getGender()),user.getAddress());
             return new ResponseUser(responseUser);
         }
         //Else is phone number
@@ -211,8 +223,14 @@ public class UserService {
                 user.setEmail(u.getEmail());
                 user.setLastname(u.getLastname());
                 user.setPhonenumber(u.getPhonenumber());
+                user.setGender(u.getGender());
+                user.setAddress(u.getAddress());
+                user.setAvatar(u.getAvatar());
+                user.setCover(u.getCover());
+                user.setBirth(u.getBirth());
             });
-            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(),user.getEmail(),user.getPhonenumber());
+            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(), user.getBirth(),user.getEmail(),
+                    user.getPhonenumber(), user.getAvatar(), user.getCover(),Gender(user.getGender()),user.getAddress());
             return new ResponseUser(responseUser);
         }
         else return null;
@@ -281,5 +299,42 @@ public class UserService {
             return userRepository.findUserByPhonenumber(username).get().getPwd();
         }
         return null;
+    }
+
+    public ResponseObject update(UpdateForm updateForm) {
+        boolean gender = updateForm.getGender().equals("male") ? true : false;
+
+        if (emailVal(updateForm.getEmail()) && phoneVal(updateForm.getPhonenumber())){
+            String oldMail = updateForm.getOldmail();
+            userRepository.findUserByEmail(oldMail).ifPresent(u -> {
+                u.setAvatar(getAvatar(updateForm.getEmail()));
+                u.setCover(getCover(updateForm.getEmail()));
+                u.setPhonenumber(updateForm.getPhonenumber());
+                u.setFirstname(updateForm.getFirstname());
+                u.setLastname(updateForm.getLastname());
+                u.setEmail(updateForm.getEmail());
+                u.setBirth(updateForm.getBirth());
+                u.setGender(gender);
+                userRepository.save(u);
+            });
+            return new ResponseObject(HttpStatus.CREATED.toString(), userRepository.findUserByEmail(updateForm.getEmail()));
+        } else return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "wrong_format");
+
+    }
+
+    public String getAvatar(String username){
+        String avt = "avatar.png";
+        String users_folder = "users";
+        String blob = users_folder+"/"+username+"/"+avt;
+        String url = "https://storage.googleapis.com/volunteer-app-c93c9.appspot.com/"+blob;
+        return url;
+    }
+
+    public String getCover(String username){
+        String cover = "cover.png";
+        String users_folder = "users";
+        String blob = users_folder+"/"+username+"/"+cover;
+        String url = "https://storage.googleapis.com/volunteer-app-c93c9.appspot.com/"+blob;
+        return url;
     }
 }

@@ -1,26 +1,32 @@
 package com.volunteer.springbootmongo.controller.firebase;
 
 
-import com.volunteer.springbootmongo.models.firebase.Posts;
-import com.volunteer.springbootmongo.service.posts.PostsService;
+import com.volunteer.springbootmongo.models.firebase.Post;
+import com.volunteer.springbootmongo.models.response.ResponseObject;
+import com.volunteer.springbootmongo.service.firebase.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/firebase")
 public class FirebaseController {
     @Autowired
-    private PostsService postsService;
+    private PostService postService;
 
     @PostMapping("/post")
-    public String savePost(@RequestBody Posts posts) throws ExecutionException, InterruptedException {
-        return postsService.savePost(posts);
+    public ResponseObject savePost(@RequestBody Post post) throws ExecutionException, InterruptedException {
+        return postService.savePost(post);
     }
 
     @GetMapping("/post/{name}")
-    public Posts getPost(@PathVariable String name) throws ExecutionException, InterruptedException {
-        return postsService.getPostDetail(name);
+    public ResponseObject getPost(@PathVariable String name) throws ExecutionException, InterruptedException {
+        return postService.getPostDetail(name);
+    }
+    @GetMapping("/post/getAll")
+    public List<Post> getAll() throws ExecutionException, InterruptedException {
+        return postService.getAll();
     }
 }

@@ -19,12 +19,12 @@ import java.util.UUID;
 public class UploadService {
     @Autowired
     private UserService userService;
-    public ResponseObject uploadImage(MultipartFile file, String username) throws IOException{
+    public ResponseObject uploadImage(MultipartFile file, String username, String type) throws IOException{
         String wrongUsername = "wrong_username_format";
-        String avt = "avatar.png";
+        String avt_cover = type+".png";
         String users_folder = "users";
         String file_content = "image/png";
-        String blob = users_folder+"/"+username+"/"+avt;
+        String blob = users_folder+"/"+username+"/"+avt_cover;
         Bucket bucket = StorageClient.getInstance().bucket();
         if(userService.usernameVal(username)){
             bucket.create(blob,file.getInputStream(),file_content).getName();
