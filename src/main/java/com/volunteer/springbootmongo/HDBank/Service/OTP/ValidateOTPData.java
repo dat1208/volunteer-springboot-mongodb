@@ -23,5 +23,9 @@ public class ValidateOTPData {
         this.OTP = OTP;
         this.data = data;
     }
+    public boolean isTimeoutOTP() {
+        Date currentDate = new Date(System.currentTimeMillis());
+        return expiredTime.compareTo(currentDate) <= 0;
+    }
 }
 

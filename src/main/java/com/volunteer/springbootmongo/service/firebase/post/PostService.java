@@ -1,31 +1,19 @@
 package com.volunteer.springbootmongo.service.firebase.post;
 
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.google.api.Http;
 import com.google.api.core.ApiFuture;
-import com.google.api.core.ApiFutures;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
-import com.google.gson.JsonParser;
-import com.google.type.DateTime;
-import com.volunteer.springbootmongo.config.JwtTokenUtil;
 import com.volunteer.springbootmongo.models.firebase.Post;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
 import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
-import org.bson.json.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
@@ -35,7 +23,7 @@ public class PostService {
 
     @Autowired
     private UploadService uploadService;
-    public ResponseObject savePost(Post post, MultipartFile file) throws ExecutionException, InterruptedException, IOException {
+    public ResponseObject savePost(Post post) throws ExecutionException, InterruptedException, IOException {
 
 
         Firestore dbFileStore = FirestoreClient.getFirestore();

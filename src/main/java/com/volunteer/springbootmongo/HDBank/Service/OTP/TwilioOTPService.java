@@ -58,11 +58,8 @@ public class TwilioOTPService {
     * Compare datate expired of OTP 3 minutes from time send this OTP*/
     public HDBankAccount validateOTP(String OTPFromClient, String clientID) {
         boolean isVerifiedOTP = OTPFromClient.equals(OTPMap.get(clientID).getOTP());
-
-        Date currentDate = new Date(System.currentTimeMillis());
-        int isStillValidatedDate = OTPMap.get(clientID).getExpiredTime().compareTo(currentDate);
-
-        if(isStillValidatedDate > 0 && isVerifiedOTP) {
+        boolean isStillValidatedDate = OTPMap.get(clientID).isTimeoutOTP();
+        if(!isStillValidatedDate && isVerifiedOTP) {
             System.out.println(OTPMap.get(clientID).getData());
             return OTPMap.get(clientID).getData();
         }
@@ -72,7 +69,14 @@ public class TwilioOTPService {
     public void removeOTP(String clientID) {
         OTPMap.remove(clientID);
     }
-
+    public void scheduleRemoveOvertimeOTP() {
+        for (Map.Entry<String, ValidateOTPData> entry : OTPMap.entrySet()) {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+            if(OTPMap.get(entry.getKey()).isTimeoutOTP()) {
+                OTPMap.remove(entry.getKey());
+            }
+        }
+    }
     private boolean isValidPhoneNumber(String phoneNumber) {
         //TODO: Implementation need to do
         return true;
