@@ -1,6 +1,7 @@
 package com.volunteer.springbootmongo.service.jwt;
 import java.util.ArrayList;
 
+import com.volunteer.springbootmongo.config.JwtTokenUtil;
 import com.volunteer.springbootmongo.repository.UserRepository;
 import com.volunteer.springbootmongo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
@@ -18,6 +21,8 @@ public class JwtUserDetailsService implements UserDetailsService {
     PasswordEncoder passwordEncoder;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
     @Autowired
     UserService userService;
     @Override
@@ -30,5 +35,16 @@ public class JwtUserDetailsService implements UserDetailsService {
 
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
+    }
+    public String getUsernameByToken(HttpServletRequest request) throws Exception{
+        final String requestTokenHeader = request.getHeader("Authorization");
+
+        String username = null;
+        String jwtToken = null;
+
+        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer "))
+            jwtToken = requestTokenHeader.substring(7);
+        username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        return username;
     }
 }

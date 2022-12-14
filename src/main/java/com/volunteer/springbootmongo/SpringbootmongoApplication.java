@@ -1,6 +1,8 @@
 package com.volunteer.springbootmongo;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.HDBankRequest.HDBankRequest;
+import com.volunteer.springbootmongo.models.data.User;
 import com.volunteer.springbootmongo.repository.UserRepository;
+import com.volunteer.springbootmongo.service.HDBank.AuthenticationHelper;
+import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
 import com.volunteer.springbootmongo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -9,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -19,6 +23,7 @@ public class SpringbootmongoApplication {
 	}
 	@Autowired
 	UserService userService;
+	AuthenticationHelper authenticationHelper;
 	@Bean
 	CommandLineRunner runner(UserRepository repository){
 		return  args -> {
