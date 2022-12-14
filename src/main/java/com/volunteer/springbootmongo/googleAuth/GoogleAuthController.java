@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/auth/google")
-
 public class GoogleAuthController {
 
     @Autowired
@@ -33,7 +32,7 @@ public class GoogleAuthController {
         System.out.println(googleUser.getEmail());
         googleAuthService.storedUser(googleUser);
         String token = jwtTokenUtil.generateToken(googleUser.getEmail());
-        ResponseUser responseUser = userService.getUserByUsername(googleUser.getEmail());
-        return ResponseEntity.ok(new JwtResponse(true, HttpStatus.OK,"Credential is valid", token, responseUser));
+//        ResponseUser responseUser = userService.getUserByUsername(googleUser.getEmail());
+        return ResponseEntity.ok("Ok");
     }
 }
