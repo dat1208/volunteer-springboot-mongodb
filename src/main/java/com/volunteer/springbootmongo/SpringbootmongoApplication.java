@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -26,6 +27,12 @@ public class SpringbootmongoApplication {
 	@Bean
 	CommandLineRunner runner(UserRepository repository){
 		return  args -> {
+			LocalDateTime date = LocalDateTime.now().minusMinutes(20);
+			System.out.println(date);
 		};
+	}
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
 }

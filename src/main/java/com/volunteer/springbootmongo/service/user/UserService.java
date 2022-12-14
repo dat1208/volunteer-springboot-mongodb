@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -26,6 +27,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
+@Repository
 public class UserService {
     @Autowired
     private final UserRepository userRepository;
@@ -66,7 +68,6 @@ public class UserService {
         Matcher matcher = pattern.matcher(phonenumber);
         return matcher.matches();
     }
-
     public boolean usernameVal(String username){
         if(emailVal(username) || phoneVal(username))
             return true;
@@ -319,7 +320,6 @@ public class UserService {
             });
             return new ResponseObject(HttpStatus.CREATED.toString(), userRepository.findUserByEmail(updateForm.getEmail()));
         } else return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "wrong_format");
-
     }
 
     public String getAvatar(String username){

@@ -68,37 +68,5 @@ public class Post {
         this.mainimage = mainimage;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Post.type getType() {
-        return type;
-    }
-
-    public void setType(Post.type type) {
-        this.type = type;
-    }
-
-    public String getTimeago() {
-        return timeago;
-    }
-
-    public void setTimeago(String timeago) {
-        this.timeago = timeago;
-    }
-
     public Post() {}
-
-    public Post(String content, String title, String subtitle,String address, type type) {
-        this.content = content;
-        this.title = title;
-        this.subtitle = subtitle;
-        this.address = address;
-        this.type = type;
-    }
 }

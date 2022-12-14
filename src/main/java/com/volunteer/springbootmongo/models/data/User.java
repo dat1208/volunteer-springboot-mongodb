@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Document("User")
@@ -26,7 +27,8 @@ public class User {
 
     private String address;
     private String pwd;
-
+    // List account HDBank (Kha)
+    private List<HDBankAccount> hdBankAccountList;
 
     public User(ObjectId _id, String firstname, String lastname, Date birth, boolean gender, String avatar, String cover, String email, String phonenumber, String address, String pwd) {
         this._id = _id;
