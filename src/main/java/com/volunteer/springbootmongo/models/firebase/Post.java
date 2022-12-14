@@ -68,5 +68,13 @@ public class Post {
         this.mainimage = mainimage;
     }
 
+    public Post(String content, String title, String subtitle, String address, Post.type type) {
+        this.content = content;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.address = address;
+        this.type = type;
+    }
+
     public Post() {}
 }
