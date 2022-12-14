@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -50,16 +51,24 @@ public class TwilioOTPService {
         } catch (Exception ex) {
             return new OTPResponse(OTPStatus.FAILED, OTPMessage.send_OTP_failure_please_resend, 0);
         }
-        return new OTPResponse(OTPStatus.DELIVERED, OTPMessage.send_OTP_successfully_waiting_for_validate, 300);
+        return new OTPResponse(OTPStatus.DELIVERED, OTPMessage.send_OTP_successfully_waiting_for_validate, 180);
     }
 
+    /*
+    * Compare datate expired of OTP 3 minutes from time send this OTP*/
     public HDBankAccount validateOTP(String OTPFromClient, String clientID) {
-        if (OTPFromClient.equals(OTPMap.get(clientID).getOTP())) {
+        boolean isVerifiedOTP = OTPFromClient.equals(OTPMap.get(clientID).getOTP());
+
+        Date currentDate = new Date(System.currentTimeMillis());
+        int isStillValidatedDate = OTPMap.get(clientID).getExpiredTime().compareTo(currentDate);
+
+        if(isStillValidatedDate > 0 && isVerifiedOTP) {
             System.out.println(OTPMap.get(clientID).getData());
             return OTPMap.get(clientID).getData();
         }
         return null;
     }
+    // TODO: Schedule TASK
     public void removeOTP(String clientID) {
         OTPMap.remove(clientID);
     }

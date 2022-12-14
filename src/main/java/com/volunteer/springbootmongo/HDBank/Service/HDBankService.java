@@ -69,9 +69,9 @@ public class HDBankService implements HDBankUserInterface {
         HDBankAccount hdBankAccount = new HDBankAccount();
         hdBankAccount.setAccountNumber(AccountNo);
         hdBankAccount.setUserID(HDBankAccountRequestData.getClientID());
-        //TODO: Check lINKED
+
         if (!AccountNo.isEmpty()) {
-            if(isLinkedWithAnOtherAccount(HDBankAccountRequestData.getClientID(), AccountNo)) {
+            if (isLinkedWithAnOtherAccount(HDBankAccountRequestData.getClientID(), AccountNo)) {
                 Map<String, Object> failureMessage = new HashMap<>();
                 failureMessage.put("accountNo", AccountNo);
                 failureMessage.put("message", Message.this_HDBank_account_linked_please_choose_another_account);
@@ -82,12 +82,11 @@ public class HDBankService implements HDBankUserInterface {
             verifyMessage.put("otp", otpResponse);
             verifyMessage.put("verifyURL", "/api/HDBank/verify");
             return ResponseEntity.status(HttpStatus.OK).body(verifyMessage);
-        } else {
-            Map<String, Object> failureMessage = new HashMap<>();
-            failureMessage.put("HDBankUser", HDBankAccountRequestData.getUsername());
-            failureMessage.put("message", Message.link_HDBank_account_failure_username_or_password_were_wrong);
-            return ResponseEntity.status(HttpStatus.OK).body(failureMessage);
         }
+        Map<String, Object> failureMessage = new HashMap<>();
+        failureMessage.put("HDBankUser", HDBankAccountRequestData.getUsername());
+        failureMessage.put("message", Message.link_HDBank_account_failure_username_or_password_were_wrong);
+        return ResponseEntity.status(HttpStatus.OK).body(failureMessage);
     }
 
     public boolean storedHDBankAccount(String clientID, HDBankAccount hdBankAccount) {
@@ -99,19 +98,20 @@ public class HDBankService implements HDBankUserInterface {
                 if (isExistedLikedToBank) {
                     userStored.get().getHdBankAccountList().add(hdBankAccount);
                 } else {
-                    List<HDBankAccount> hdBankAccountList = new ArrayList<HDBankAccount>();
+                    List<HDBankAccount> hdBankAccountList = new ArrayList<>();
                     hdBankAccountList.add(hdBankAccount);
                     userStored.get().setHdBankAccountList(hdBankAccountList);
                 }
                 userRepository.save(userStored.get());
-            }
+            };
         } catch (Exception ex) {
             System.out.println(ex);
             return false;
         }
         return true;
     }
-//TODO Need to implement;
+
+    //TODO Need to implement;
     public ResponseEntity<?> verifyOTP(OTPVerifyRequestData otpVerifyRequestData) {
         HDBankAccount hdBankAccount = twilioOTPService.validateOTP(otpVerifyRequestData.getOTP(), otpVerifyRequestData.getClientID());
         if (hdBankAccount != null) {

@@ -31,6 +31,7 @@ import org.springframework.web.client.RestTemplate;
 public class HDBankRequest implements HDBankRequestInterface {
     @Autowired
     private final HDBankConfig hdBankConfig;
+
     private HttpHeaders getDefaultHeader() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -38,10 +39,10 @@ public class HDBankRequest implements HDBankRequestInterface {
         headers.set("X-api-key", hdBankConfig.getHDBankOpenApiKey());
         return headers;
     }
+
     @Override
     public void getAccessToken() {
         RestTemplate restTemplate = new RestTemplate();
-
         HttpHeaders headers = new HttpHeaders();
         MultiValueMap<String, String> bodyParam = new LinkedMultiValueMap<>();
         bodyParam.add("client_id", hdBankConfig.getHDBankClientID());
@@ -87,16 +88,19 @@ public class HDBankRequest implements HDBankRequestInterface {
         requestBody.put("data", new Login(credential, hdBankConfig.getPublicKey()));
 
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(requestBody, getDefaultHeader());
-
-        ResponseEntity<LoginResponse> response =
-                restTemplate.exchange(LoginURL, HttpMethod.POST, httpEntity, LoginResponse.class);
-        if (response.getStatusCode() == HttpStatus.OK && response.hasBody()) {
-            if (response.getBody().getData().getAccountNo() != null) {
-                System.out.println("LOGIN: "+ response.getBody().getData().getAccountNo());
-                return response.getBody().getData().getAccountNo();
+        try {
+            ResponseEntity<LoginResponse> response =
+                    restTemplate.exchange(LoginURL, HttpMethod.POST, httpEntity, LoginResponse.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.hasBody()) {
+                if (response.getBody().getData().getAccountNo() != null) {
+                    System.out.println("LOGIN: " + response.getBody().getData().getAccountNo());
+                    return response.getBody().getData().getAccountNo();
+                }
+            } else if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                //TODO: Đạt Run new request
             }
-        } else if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            //TODO: Đạt Run new request
+        } catch (Exception ex) {
+            System.out.println("Link HDBank Account Ex: " + ex);
         }
         return "";
     }
