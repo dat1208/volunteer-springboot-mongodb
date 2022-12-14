@@ -46,7 +46,6 @@ public class ResponseUser {
         this.gender = gender;
         this.address = address;
     }
-
     public ResponseUser(String firstname, String lastname, String email, String phonenumber) {
         this.firstname = firstname;
         this.lastname = lastname;

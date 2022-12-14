@@ -1,5 +1,7 @@
 package com.volunteer.springbootmongo.config;
 
+import com.volunteer.springbootmongo.googleAuth.OAuth2FailureHandler;
+import com.volunteer.springbootmongo.googleAuth.OAuth2SuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private EncoderConfig encoderConfig;
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         // configure AuthenticationManager so that it knows from where to load
@@ -45,6 +48,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Autowired
+    private OAuth2FailureHandler oAuth2FailureHandler;
+    @Autowired
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         // We don't need CSRF for this example
@@ -57,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().oauth2Login().successHandler(oAuth2SuccessHandler).failureHandler(oAuth2FailureHandler);
 
         // Add a filter to validate the tokens with every request
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
