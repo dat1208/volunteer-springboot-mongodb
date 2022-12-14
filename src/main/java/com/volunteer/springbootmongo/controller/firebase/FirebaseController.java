@@ -6,7 +6,9 @@ import com.volunteer.springbootmongo.models.response.ResponseObject;
 import com.volunteer.springbootmongo.service.firebase.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -17,8 +19,14 @@ public class FirebaseController {
     private PostService postService;
 
     @PostMapping("/post")
-    public ResponseObject savePost(@RequestBody Post post) throws ExecutionException, InterruptedException {
-        return postService.savePost(post);
+    public ResponseObject savePost(@RequestParam("file") MultipartFile file,
+                                   @RequestParam(name = "title") String title,
+                                   @RequestParam(name = "content") String content,
+                                   @RequestParam(name = "subtitle") String subtitle,
+                                   @RequestParam(name = "type") Post.type type,
+                                   @RequestParam(name = "address") String address) throws ExecutionException, InterruptedException, IOException {
+
+        return postService.savePost(new Post(content,title,subtitle,address, type),file);
     }
 
     @GetMapping("/post/{name}")
