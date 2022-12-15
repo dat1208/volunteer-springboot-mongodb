@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -322,6 +323,33 @@ public class UserService {
         } else return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "wrong_format");
     }
 
+    public void insertPost(String id, String username){
+        if(emailVal(username)){
+            userRepository.findUserByEmail(username).ifPresent(u -> {
+                if(u.getPosts() != null){
+                    var listPost = new java.util.ArrayList<>(u.getPosts().stream().toList());
+                    listPost.add(id);
+                    u.setPosts(listPost);
+                }
+                else {
+                    u.setPosts(Collections.singletonList(id));
+                }
+                userRepository.save(u);
+            });
+        }else{
+            userRepository.findUserByPhonenumber(username).ifPresent(u -> {
+                if(u.getPosts() != null){
+                    var listPost = new java.util.ArrayList<>(u.getPosts().stream().toList());
+                    listPost.add(id);
+                    u.setPosts(listPost);
+                }
+                else {
+                    u.setPosts(Collections.singletonList(id));
+                }
+                userRepository.save(u);
+            });
+        }
+    }
     public String getAvatar(String username){
         String avt = "avatar.png";
         String users_folder = "users";
