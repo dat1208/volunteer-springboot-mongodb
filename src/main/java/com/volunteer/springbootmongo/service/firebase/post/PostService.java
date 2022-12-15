@@ -48,7 +48,12 @@ public class PostService {
           post.setId(id);
           Long dateTime = System.currentTimeMillis();
           post.setDatecreated(dateTime.toString());
-          post.setType(Post.type.QG);
+      if(post.getType().equals(Post.type.TN) && post.getTotalUsers() == 0)
+          return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "TN post need totalUsers");
+      if(post.getType().equals(Post.type.QG)  && post.getTotalMoney() == 0)
+            return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "QG post need totalMoney");
+      if(post.getType().equals(Post.type.HP) && post.getTotalMoney() == 0)
+          return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "HP post need totalMoney");
       collectionApiFuture.get().set(post);
       //Append post to users
       String username = jwtUserDetailsService.getUsernameByToken(request);
