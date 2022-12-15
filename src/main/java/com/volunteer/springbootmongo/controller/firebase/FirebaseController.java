@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -24,9 +25,9 @@ public class FirebaseController {
                                    @RequestParam(name = "content") String content,
                                    @RequestParam(name = "subtitle") String subtitle,
                                    @RequestParam(name = "type") Post.type type,
-                                   @RequestParam(name = "address") String address) throws ExecutionException, InterruptedException, IOException {
+                                   @RequestParam(name = "address") String address, HttpServletRequest request) throws Exception {
 
-        return postService.savePost(new Post(content,title,subtitle,address, type),file);
+        return postService.savePost(new Post(content,title,subtitle,address, type),file,request);
     }
 
     @GetMapping("/post/{name}")
