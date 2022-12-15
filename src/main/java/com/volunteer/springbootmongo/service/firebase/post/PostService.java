@@ -5,6 +5,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.volunteer.springbootmongo.models.firebase.Post;
+import com.volunteer.springbootmongo.models.firebase.TNPost;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
 import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
 import com.volunteer.springbootmongo.service.jwt.JwtUserDetailsService;
@@ -19,13 +20,15 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 @Service
 public class PostService {
-    final String COLLECTION_NAME = "Post";
+    final String COLLECTION_NAME_POST = "Post";
+    final String COLLECTION_NAME_TNPOST = "TNPost";
 
     @Autowired
     private UploadService uploadService;
@@ -36,12 +39,9 @@ public class PostService {
     @Autowired
     private UserService userService;
     public ResponseObject savePost(Post post, MultipartFile file, HttpServletRequest request) throws Exception {
+      Firestore dbFileStore = FirestoreClient.getFirestore();
+      ApiFuture<DocumentReference> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME_POST).add(post);
 
-
-        Firestore dbFileStore = FirestoreClient.getFirestore();
-
-
-      ApiFuture<DocumentReference> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME).add(post);
       String id = collectionApiFuture.get().getId();
       String url = uploadService.uploadPostImage(file,id);
           post.setMainimage(url);
@@ -58,12 +58,15 @@ public class PostService {
       //Append post to users
       String username = jwtUserDetailsService.getUsernameByToken(request);
       userService.insertPost(id,username);
+      //Create collection to save users join TN post
+      if(post.getType().equals(Post.type.TN))
+            addCollectionTNPost(id);
       return new ResponseObject(HttpStatus.CREATED.toString(),post);
     }
 
     public ResponseObject getPostDetail(String name) throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
-        DocumentReference documentReference = dbFileStore.collection(COLLECTION_NAME).document(name);
+        DocumentReference documentReference = dbFileStore.collection(COLLECTION_NAME_POST).document(name);
         ApiFuture<DocumentSnapshot> future = documentReference.get();
         DocumentSnapshot document = future.get();
 
@@ -102,10 +105,22 @@ public class PostService {
             return result/1000/60/24 +" ngày trước";
         } else return result/1000/60/24/365 +" năm trước";
     }
+    public void addCollectionTNPost(String id){
+
+        Firestore dbFileStore = FirestoreClient.getFirestore();
+        List<String> listUsers = new ArrayList<>();
+        TNPost tnPost = new TNPost();
+        ApiFuture<WriteResult> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(id).create(tnPost);
+
+    }
     public List<Post> getAll() throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
-        CollectionReference posts = dbFileStore.collection(COLLECTION_NAME);
+        CollectionReference posts = dbFileStore.collection(COLLECTION_NAME_POST);
         List<Post> listPost = posts.get().get().toObjects(Post.class).stream().toList();
+        for (Post post:listPost) {
+            if(post.getDatecreated() != null)
+            post.setTimeago(calTimeAgo(Long.valueOf((post.getDatecreated()))));
+        }
         return  listPost;
     }
 }
