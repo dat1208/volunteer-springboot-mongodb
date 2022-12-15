@@ -10,6 +10,5 @@ import org.springframework.http.ResponseEntity;
  */
 public interface HDBankUserInterface {
     ResponseEntity<?> LinkHDBankAccount(HDBankAccountRequestData HDBankAccountRequestData);
-
     ResponseEntity<?>  registerHDBankAccount(HDBankRegister hdBankRegister);
 }

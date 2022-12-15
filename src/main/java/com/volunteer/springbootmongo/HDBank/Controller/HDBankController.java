@@ -1,11 +1,8 @@
 package com.volunteer.springbootmongo.HDBank.Controller;
 
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.HDBankAccountRequestData;
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.HDBankRegister;
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.OTPVerifyRequestData;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.*;
 import com.volunteer.springbootmongo.HDBank.Service.HDBankService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +27,19 @@ public class HDBankController {
     public ResponseEntity<?> verify(@RequestBody OTPVerifyRequestData otpVerifyRequestData) {
         return hdBankService.verifyOTP(otpVerifyRequestData);
     }
-
+    @PostMapping("/resend-otp")
+    public ResponseEntity<?> resendOTP(@RequestBody HDBankResendOTPRequestData hdBankResendOTPRequestData) {
+        return hdBankService.resendOTP(hdBankResendOTPRequestData);
+    }
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody HDBankRegister hdBankRegister) {
         return hdBankService.registerHDBankAccount(hdBankRegister);
+    }
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody HDBankChangePasswordRequestData hdBankChangePasswordRequestData) {
+        // Check OLD password;
+        // if old passsword oke - > Change then response;
+        return null;
     }
 
 

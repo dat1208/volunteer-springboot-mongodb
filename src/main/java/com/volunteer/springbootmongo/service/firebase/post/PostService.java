@@ -10,6 +10,7 @@ import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -23,7 +24,7 @@ public class PostService {
 
     @Autowired
     private UploadService uploadService;
-    public ResponseObject savePost(Post post) throws ExecutionException, InterruptedException, IOException {
+    public ResponseObject savePost(Post post, MultipartFile file) throws ExecutionException, InterruptedException, IOException {
 
 
         Firestore dbFileStore = FirestoreClient.getFirestore();
