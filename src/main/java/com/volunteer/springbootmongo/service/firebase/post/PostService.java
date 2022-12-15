@@ -9,12 +9,20 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.JsonParser;
 import com.google.type.DateTime;
+import com.volunteer.springbootmongo.config.JwtTokenUtil;
 import com.volunteer.springbootmongo.models.firebase.Post;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
+import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
+import com.volunteer.springbootmongo.service.jwt.JwtUserDetailsService;
+import com.volunteer.springbootmongo.service.user.UserService;
 import org.bson.json.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -27,16 +35,33 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class PostService {
     final String COLLECTION_NAME = "Post";
-    public ResponseObject savePost(Post post) throws ExecutionException, InterruptedException {
+
+    @Autowired
+    private UploadService uploadService;
+
+    @Autowired
+    private JwtUserDetailsService jwtUserDetailsService;
+
+    @Autowired
+    private UserService userService;
+    public ResponseObject savePost(Post post, MultipartFile file, HttpServletRequest request) throws Exception {
 
 
         Firestore dbFileStore = FirestoreClient.getFirestore();
-        Long dateTime = System.currentTimeMillis();
-        post.setDatecreated(dateTime.toString());
+
 
       ApiFuture<DocumentReference> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME).add(post);
       String id = collectionApiFuture.get().getId();
-
+      String url = uploadService.uploadPostImage(file,id);
+          post.setMainimage(url);
+          post.setId(id);
+          Long dateTime = System.currentTimeMillis();
+          post.setDatecreated(dateTime.toString());
+          post.setType(Post.type.QG);
+      collectionApiFuture.get().set(post);
+      //Append post to users
+      String username = jwtUserDetailsService.getUsernameByToken(request);
+      userService.insertPost(id,username);
       return new ResponseObject(HttpStatus.CREATED.toString(),post);
     }
 
@@ -81,10 +106,10 @@ public class PostService {
             return result/1000/60/24 +" ngày trước";
         } else return result/1000/60/24/365 +" năm trước";
     }
-
     public List<Post> getAll() throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
         CollectionReference posts = dbFileStore.collection(COLLECTION_NAME);
-        return  posts.get().get().toObjects(Post.class);
+        List<Post> listPost = posts.get().get().toObjects(Post.class).stream().toList();
+        return  listPost;
     }
 }

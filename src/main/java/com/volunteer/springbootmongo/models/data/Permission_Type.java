@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Document("Permission_Type")
 public class Permission_Type {
-
     private ObjectId _id;
     private String name;
     private boolean delete;

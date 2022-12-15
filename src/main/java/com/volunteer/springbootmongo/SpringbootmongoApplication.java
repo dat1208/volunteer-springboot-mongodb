@@ -1,15 +1,13 @@
 package com.volunteer.springbootmongo;
-import com.volunteer.springbootmongo.models.data.User;
 import com.volunteer.springbootmongo.repository.UserRepository;
-import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
 import com.volunteer.springbootmongo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -24,8 +22,10 @@ public class SpringbootmongoApplication {
 	CommandLineRunner runner(UserRepository repository){
 		return  args -> {
 
-			LocalDateTime date = LocalDateTime.now().minusMinutes(20);
-			System.out.println(date);
 		};
+	}
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
 }

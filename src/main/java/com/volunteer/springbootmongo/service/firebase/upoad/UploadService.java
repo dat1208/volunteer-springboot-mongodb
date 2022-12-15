@@ -19,14 +19,14 @@ import java.util.UUID;
 public class UploadService {
     @Autowired
     private UserService userService;
-    public ResponseObject uploadImage(MultipartFile file, String username, String type) throws IOException{
+    public ResponseObject uploadImage(MultipartFile file, String id, String type) throws IOException{
         String wrongUsername = "wrong_username_format";
         String avt_cover = type+".png";
         String users_folder = "users";
         String file_content = "image/png";
-        String blob = users_folder+"/"+username+"/"+avt_cover;
+        String blob = users_folder+"/"+id+"/"+avt_cover;
         Bucket bucket = StorageClient.getInstance().bucket();
-        if(userService.usernameVal(username)){
+        if(userService.usernameVal(id)){
             bucket.create(blob,file.getInputStream(),file_content).getName();
 
             Date dateCreated = new Date(bucket.get(blob).getCreateTime());
@@ -34,12 +34,25 @@ public class UploadService {
 
             String url = "https://storage.googleapis.com/volunteer-app-c93c9.appspot.com/"+blob;
 
-            return new ResponseObject((HttpStatus.CREATED.toString()),new ImageModel(username,url, dateCreated, dateUpdated));
+            return new ResponseObject((HttpStatus.CREATED.toString()),new ImageModel(id,url, dateCreated, dateUpdated));
         }
-
         else return new ResponseObject((HttpStatus.NO_CONTENT.toString()),wrongUsername);
     }
+    public String uploadPostImage(MultipartFile file, String id) throws IOException{
+        String post_folder = "postImage";
+        String postImage = "main.png";
+        String file_content = "image/png";
+        String blob = "postImage"+"/"+id+"/"+postImage;
 
+        Bucket bucket = StorageClient.getInstance().bucket();
+        bucket.create(blob,file.getInputStream(),file_content).getName();
+
+        Date dateCreated = new Date(bucket.get(blob).getCreateTime());
+        Date dateUpdated = new Date(bucket.get(blob).getUpdateTime());
+
+        String url = "https://storage.googleapis.com/volunteer-app-c93c9.appspot.com/"+blob;
+        return url;
+    }
     private String generateFileName(String originalFileName) {
         return UUID.randomUUID().toString() + "." + getExtension(originalFileName);
     }

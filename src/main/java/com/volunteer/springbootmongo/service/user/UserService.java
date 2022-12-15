@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +28,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
+@Repository
 public class UserService {
     @Autowired
     private final UserRepository userRepository;
@@ -66,7 +69,6 @@ public class UserService {
         Matcher matcher = pattern.matcher(phonenumber);
         return matcher.matches();
     }
-
     public boolean usernameVal(String username){
         if(emailVal(username) || phoneVal(username))
             return true;
@@ -319,9 +321,35 @@ public class UserService {
             });
             return new ResponseObject(HttpStatus.CREATED.toString(), userRepository.findUserByEmail(updateForm.getEmail()));
         } else return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "wrong_format");
-
     }
 
+    public void insertPost(String id, String username){
+        if(emailVal(username)){
+            userRepository.findUserByEmail(username).ifPresent(u -> {
+                if(u.getPosts() != null){
+                    var listPost = new java.util.ArrayList<>(u.getPosts().stream().toList());
+                    listPost.add(id);
+                    u.setPosts(listPost);
+                }
+                else {
+                    u.setPosts(Collections.singletonList(id));
+                }
+                userRepository.save(u);
+            });
+        }else{
+            userRepository.findUserByPhonenumber(username).ifPresent(u -> {
+                if(u.getPosts() != null){
+                    var listPost = new java.util.ArrayList<>(u.getPosts().stream().toList());
+                    listPost.add(id);
+                    u.setPosts(listPost);
+                }
+                else {
+                    u.setPosts(Collections.singletonList(id));
+                }
+                userRepository.save(u);
+            });
+        }
+    }
     public String getAvatar(String username){
         String avt = "avatar.png";
         String users_folder = "users";
