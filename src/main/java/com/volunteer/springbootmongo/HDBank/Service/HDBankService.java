@@ -1,30 +1,46 @@
 package com.volunteer.springbootmongo.HDBank.Service;
 
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.HDBankAccountRequestData;
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.HDBankRegister;
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.HDBankResendOTPRequestData;
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.OTPVerifyRequestData;
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientResponse.Message;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.*;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientResponse.AppsChangePasswordResponse;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientResponse.ResponseData.AppsChangePasswordResponseData;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientResponse.ResponseForm.Message;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientResponse.ResponseForm.Response;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientResponse.ResponseForm.Status;
 import com.volunteer.springbootmongo.HDBank.Interface.HDBankUserInterface;
-import com.volunteer.springbootmongo.HDBank.Service.OTP.RequestForm.OTPMessage;
 import com.volunteer.springbootmongo.HDBank.Service.OTP.RequestForm.OTPResponse;
 import com.volunteer.springbootmongo.HDBank.Service.OTP.RequestForm.OTPStatus;
 import com.volunteer.springbootmongo.HDBank.Service.OTP.RequestForm.OTPValidated;
 import com.volunteer.springbootmongo.HDBank.Service.OTP.TwilioOTPService;
+import com.volunteer.springbootmongo.HDBank.Service.RSA.ChangePasswordMessage;
+import com.volunteer.springbootmongo.HDBank.Service.RSA.LoginMessage;
+import com.volunteer.springbootmongo.HDBank.Service.RSA.RSAKeyPairGenerator;
 import com.volunteer.springbootmongo.HDBank.SpringWebClient.HDBankRequest.HDBankConfig;
 import com.volunteer.springbootmongo.HDBank.SpringWebClient.HDBankRequest.HDBankRequest;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Data.HDBankRegisterData;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.ResponseForm.Response.RegisterResponse;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.ChangePasswordRequest;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Data.ChangePasswordRequestData;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Data.RegisterData;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.ResponseForm.Responses.RegisterResponse;
 import com.volunteer.springbootmongo.models.data.HDBankAccount;
 import com.volunteer.springbootmongo.models.data.User;
 import com.volunteer.springbootmongo.repository.UserRepository;
 import com.volunteer.springbootmongo.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -34,6 +50,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Service
 public class HDBankService implements HDBankUserInterface {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HDBankService.class);
     @Autowired
     private final UserRepository userRepository;
     @Autowired
@@ -43,79 +60,89 @@ public class HDBankService implements HDBankUserInterface {
     @Autowired
     private TwilioOTPService twilioOTPService;
     @Autowired
+    private ValidateService validateService;
+    @Autowired
     UserService userService;
 
-    private String credential(String username, String password) {
+    private String credential(String message) {
         if (hdBankConfig.getPublicKey().equals("")) {
             hdBankRequest.getHDBankPublicKey();
         }
-        return RSAKeyPairGenerator.getRSAKeyPairGenerator(username, password, hdBankConfig.getPublicKey());
-    }
-    private boolean isExistLinked(String clientID, String AccountNo) {
-        Optional<User> userStored = userRepository.findById(clientID).stream().findFirst();
-        boolean isExistedLikedToBank = userStored.get().getHdBankAccountList() != null;
-        if (isExistedLikedToBank) {
-            if (userStored.get().getHdBankAccountList().size() >= 3) {
-                return false;
-            }
-            for (int index = 0; index < userStored.get().getHdBankAccountList().size(); index++) {
-                if (AccountNo.equals(userStored.get().getHdBankAccountList().get(index).getAccountNumber())) {
-                    return false;
-                }
-            }
+        String credential = "";
+        try {
+            credential = RSAKeyPairGenerator.getEncoderRSA(message, hdBankConfig.getPublicKey());
+        } catch (IllegalBlockSizeException | NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (BadPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e);
         }
-        return true;
+        return credential;
     }
-    private boolean isOverLinkedAccount(String clientID) {
-        Optional<User> userStored = userRepository.findById(clientID).stream().findFirst();
-        if (userStored.get().getHdBankAccountList() != null) {
-            if (userStored.get().getHdBankAccountList().size() >= 3) {
-                return true;
-            }
+
+    private String getJsonFromObject(Object object) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (JsonGenerationException | JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
-        return false;
+        return "";
     }
+
     public ResponseEntity<?> sendOTP(String clientID, String phone, Object data) {
         OTPResponse otpResponse = twilioOTPService.sendOTPPhone(clientID, phone, data);
 
         Map<String, Object> verifyMessage = new HashMap<>();
         verifyMessage.put("clientID", clientID);
         verifyMessage.put("otp", otpResponse);
-        if(otpResponse.getStatus().equals(OTPStatus.SUCCESS)) {
+        if (otpResponse.getStatus().equals(OTPStatus.SUCCESS)) {
             verifyMessage.put("verifyURL", "/api/HDBank/verify");
         }
         return ResponseEntity.status(HttpStatus.OK).body(verifyMessage);
     }
-    public ResponseEntity<?> LinkHDBankAccount(HDBankAccountRequestData HDBankAccountRequestData) {
+
+    public ResponseEntity<?> LinkHDBankAccount(AppsLoginRequestData AppsLoginRequestData) {
         Map<String, Object> ResponseMessage = new HashMap<>();
-        if(!userService.phoneVal(HDBankAccountRequestData.getPhone()))  {
+
+        if (!userService.phoneVal(AppsLoginRequestData.getPhone())) {
             ResponseMessage.put("message", Message.the_Phone_number_is_wrong_format);
             return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage);
         }
 
-        String credential = credential(HDBankAccountRequestData.getUsername(), HDBankAccountRequestData.getPassword());
+        LoginMessage loginMessage = new LoginMessage(AppsLoginRequestData.getUsername(), AppsLoginRequestData.getPassword());
+        String credential = credential(getJsonFromObject(loginMessage));
+
         String AccountNo = hdBankRequest.linkClient(credential);
 
         HDBankAccount hdBankAccount = new HDBankAccount();
+        hdBankAccount.setHDBankUsername(AppsLoginRequestData.getUsername());
+        hdBankAccount.getHDBankOldPassword().add(AppsLoginRequestData.getPassword());
         hdBankAccount.setAccountNumber(AccountNo);
-        hdBankAccount.setUserID(HDBankAccountRequestData.getClientID());
+        hdBankAccount.setUserID(AppsLoginRequestData.getClientID());
 
 
         if (!AccountNo.isEmpty()) {
-            if (isOverLinkedAccount(HDBankAccountRequestData.getClientID())) {
+            if (validateService.isOverLinkedAccount(AppsLoginRequestData.getClientID())) {
                 ResponseMessage.put("message", Message.current_user_is_limit_link_bank_account);
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage);
             }
-            if (!isExistLinked(HDBankAccountRequestData.getClientID(), AccountNo)) {
+            if (!validateService.isExistLinked(AppsLoginRequestData.getClientID(), AccountNo)) {
                 ResponseMessage.put("message", Message.this_HDBank_account_linked_please_choose_another_account);
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage);
             }
-            return sendOTP(HDBankAccountRequestData.getClientID(), HDBankAccountRequestData.getPhone(), hdBankAccount);
+            return sendOTP(AppsLoginRequestData.getClientID(), AppsLoginRequestData.getPhone(), hdBankAccount);
         }
-        ResponseMessage.put("HDBankUser", HDBankAccountRequestData.getUsername());
+        ResponseMessage.put("HDBankUser", AppsLoginRequestData.getUsername());
         ResponseMessage.put("message", Message.link_HDBank_account_failure_username_or_password_were_wrong);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage);
     }
+
     public boolean storedHDBankAccount(String clientID, HDBankAccount hdBankAccount) {
         try {
             Optional<User> userStored = userRepository.findById(clientID).stream().findFirst();
@@ -137,16 +164,17 @@ public class HDBankService implements HDBankUserInterface {
         }
         return true;
     }
-    public ResponseEntity<?> verifyOTP(OTPVerifyRequestData otpVerifyRequestData) {
 
-        OTPValidated otpValidated = twilioOTPService.validateOTP(otpVerifyRequestData.getOTP(), otpVerifyRequestData.getClientID());
+    public ResponseEntity<?> verifyOTP(AppsOTPVerifyRequestData appsOtpVerifyRequestData) {
+
+        OTPValidated otpValidated = twilioOTPService.validateOTP(appsOtpVerifyRequestData.getOTP(), appsOtpVerifyRequestData.getClientID());
         Map<String, Object> responseMessage = new HashMap<>();
 
         if (otpValidated.getHdBankAccount() != null) {
-            boolean isStoredHDBankAccount = storedHDBankAccount(otpVerifyRequestData.getClientID(), otpValidated.getHdBankAccount());
+            boolean isStoredHDBankAccount = storedHDBankAccount(appsOtpVerifyRequestData.getClientID(), otpValidated.getHdBankAccount());
             if (isStoredHDBankAccount) {
-                twilioOTPService.removeOTP(otpVerifyRequestData.getClientID());
-                responseMessage.put("request", otpVerifyRequestData);
+                twilioOTPService.removeOTP(appsOtpVerifyRequestData.getClientID());
+                responseMessage.put("request", appsOtpVerifyRequestData);
                 responseMessage.put("response", otpValidated.getOtpResponse());
                 return ResponseEntity.status(HttpStatus.CREATED).body(responseMessage);
             }
@@ -156,44 +184,130 @@ public class HDBankService implements HDBankUserInterface {
     }
 
     @Override
-    public ResponseEntity<?> registerHDBankAccount(HDBankRegister hdBankRegister) {
+    public ResponseEntity<?> registerHDBankAccount(AppsRegisterRequestData appsRegisterRequestData) {
         // Validate này kia;
-        String credential = credential(hdBankRegister.getUsername(), hdBankRegister.getPassword());
-        HDBankRegisterData hdBankRegisterData = new HDBankRegisterData(
+        if (!validateService.isValidatedRegisterInput(appsRegisterRequestData)) {
+            Map<String, Object> responseMessage = new HashMap<>();
+            responseMessage.put("status", "INVALID_DATA");
+            responseMessage.put("message", "request_data_is_wrong_format_check_document_again");
+            ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+        }
+        LoginMessage loginMessage = new LoginMessage(appsRegisterRequestData.getUsername(), appsRegisterRequestData.getPassword());
+        String credential = credential(getJsonFromObject(loginMessage));
+        RegisterData registerData = new RegisterData(
                 credential,
                 hdBankConfig.getPublicKey(),
-                hdBankRegister.getEmail(),
-                hdBankRegister.getFullName(),
-                hdBankRegister.getPhone(),
-                hdBankRegister.getIdentityNumber()
+                appsRegisterRequestData.getEmail(),
+                appsRegisterRequestData.getFullName(),
+                appsRegisterRequestData.getPhone(),
+                appsRegisterRequestData.getIdentityNumber()
         );
-        ResponseEntity<RegisterResponse> registerResponse = hdBankRequest.register(hdBankRegisterData);
+        ResponseEntity<RegisterResponse> registerResponse = hdBankRequest.register(registerData);
 
         if (registerResponse.getStatusCode() == HttpStatus.OK) {
             if (registerResponse.getBody().getData().getUserId() != null) {
                 String AccountNo = hdBankRequest.linkClient(credential);
                 HDBankAccount hdBankAccount = new HDBankAccount(
-                        hdBankRegister.getClientID(),
+                        appsRegisterRequestData.getClientID(),
                         registerResponse.getBody().getData().getUserId(),
-                        hdBankRegister.getUsername(),
-                        hdBankRegister.getPassword(),
-                        hdBankRegister.getFullName(),
+                        appsRegisterRequestData.getUsername(),
+                        appsRegisterRequestData.getPassword(),
+                        appsRegisterRequestData.getFullName(),
                         AccountNo,
-                        hdBankRegister.getPhone(),
-                        hdBankRegister.getEmail(),
-                        hdBankRegister.getIdentityNumber()
+                        appsRegisterRequestData.getPhone(),
+                        appsRegisterRequestData.getEmail(),
+                        appsRegisterRequestData.getIdentityNumber()
                 );
-                return sendOTP(hdBankRegister.getClientID(), hdBankAccount.getPhone(), hdBankAccount);
+                hdBankAccount.getHDBankOldPassword().add(appsRegisterRequestData.getPassword());
+                return sendOTP(appsRegisterRequestData.getClientID(), hdBankAccount.getPhone(), hdBankAccount);
             }
         }
         return ResponseEntity.status(HttpStatus.OK).body(registerResponse.getBody());
     }
 
-    public ResponseEntity<?> resendOTP(HDBankResendOTPRequestData hdBankResendOTPRequestData) {
+    public ResponseEntity<?> resendOTP(AppsResendOTPRequestData appsResendOTPRequestData) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 twilioOTPService.resendOTPPhone(
-                        hdBankResendOTPRequestData.getClientID(),
-                        hdBankResendOTPRequestData.getPhone()));
+                        appsResendOTPRequestData.getClientID(),
+                        appsResendOTPRequestData.getPhone()));
     }
 
+    public ResponseEntity<?> changePasswordHDBankAccount(AppsChangePasswordRequestData appsChangePasswordRequestData) {
+        AppsChangePasswordResponse appsChangePasswordResponse = new AppsChangePasswordResponse();
+        appsChangePasswordResponse.setData(
+                new AppsChangePasswordResponseData(appsChangePasswordRequestData.getClientID(), appsChangePasswordRequestData.getHdBankUsername()));
+
+        if (validateService.isValidPasswordType(appsChangePasswordRequestData.getNewPassword())) {
+            appsChangePasswordResponse.setResponse(new Response(Status.WRONG_FORMAT, Message.new_password_is_wrong_format));
+            return ResponseEntity.status(HttpStatus.OK).body(appsChangePasswordResponse);
+        }
+
+        User currentUser = userRepository.findById(appsChangePasswordRequestData.getClientID()).get();
+        int currentHDBankAccountIndex = 0;
+        if (currentUser != null) {
+            if (currentUser.getHdBankAccountList() != null) {
+                List<HDBankAccount> HBankAccountList = currentUser.getHdBankAccountList().stream().toList();
+
+                for (HDBankAccount hdBankAccountStored : HBankAccountList) {
+                    if (hdBankAccountStored.getHDBankUsername().equals(appsChangePasswordRequestData.getHdBankUsername())) {
+                        if (hdBankAccountStored.getHDBankOldPassword() != null) {
+
+                            if (validateService.isMatchWithOldPassword(
+                                    hdBankAccountStored.getHDBankOldPassword(),
+                                    appsChangePasswordRequestData.getNewPassword())) {
+
+                                appsChangePasswordResponse.setResponse(
+                                        new Response(
+                                                Status.FAILURE,
+                                                Message.new_password_is_used_in_a_previous_time_try_another_password));
+
+                                return ResponseEntity.status(HttpStatus.OK).body(appsChangePasswordResponse);
+                            }
+                        }
+                        break;
+                    }
+                    currentHDBankAccountIndex += 1;
+                }
+            }
+        }
+        ChangePasswordMessage changePassword =
+                new ChangePasswordMessage(
+                        appsChangePasswordRequestData.getHdBankUsername(),
+                        appsChangePasswordRequestData.getOldPassword(),
+                        appsChangePasswordRequestData.getNewPassword());
+
+        String credential = credential(getJsonFromObject(changePassword));
+
+        ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
+        changePasswordRequest.setData(new ChangePasswordRequestData(
+                credential,
+                hdBankConfig.getPublicKey()
+        ));
+        boolean isChangePasswordSuccess = hdBankRequest.ChangePasswordHDBankAccount(changePasswordRequest).getBody().getResponse().getResponseCode() == "00";
+        if (isChangePasswordSuccess) {
+            try {
+                List<HDBankAccount> hdBankAccountList = currentUser.getHdBankAccountList();
+                if(hdBankAccountList.size() > 4) {
+                    hdBankAccountList
+                            .get(currentHDBankAccountIndex)
+                            .getHDBankOldPassword().remove(0);
+                }
+                hdBankAccountList
+                        .get(currentHDBankAccountIndex)
+                        .getHDBankOldPassword()
+                        .add(appsChangePasswordRequestData.getNewPassword());
+
+                userRepository.save(currentUser);
+
+            } catch (Exception ex) {
+                LOGGER.error("Stored Old Password Error: {}", ex);
+                appsChangePasswordResponse.setResponse(
+                        new Response(Status.SERVER_ERROR, Message.valueOf(ex.getMessage())));
+
+                return ResponseEntity.status(HttpStatus.OK).body(appsChangePasswordResponse);
+            }
+            appsChangePasswordResponse.setResponse(new Response(Status.SUCCESS, Message.change_password_success_login_again_please));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(appsChangePasswordResponse);
+    }
 }

@@ -1,14 +1,9 @@
 package com.volunteer.springbootmongo.HDBank.SpringWebClient.HDBankRequest;
 
 import com.volunteer.springbootmongo.HDBank.Interface.HDBankRequestInterface;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.*;
 import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Data.*;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.HDBankRegisterRequest;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Login;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Request;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.ResponseForm.Response.LoginResponse;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.ResponseForm.Response.PublicKeyResponse;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.ResponseForm.Response.RefreshTokenResponse;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.ResponseForm.Response.RegisterResponse;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.ResponseForm.Responses.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 public class HDBankRequest implements HDBankRequestInterface {
     @Autowired
     private final HDBankConfig hdBankConfig;
-
     private HttpHeaders getDefaultHeader() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -106,40 +100,52 @@ public class HDBankRequest implements HDBankRequestInterface {
     }
 
     @Override
-    public ResponseEntity<RegisterResponse> register(HDBankRegisterData hdBankRegisterdata) {
+    public ResponseEntity<RegisterResponse> register(RegisterData registerdata) {
         RestTemplate restTemplate = new RestTemplate();
         String registerURL = hdBankConfig.getHDBankOpenApiBaseURL() + "/register";
-        HDBankRegisterRequest hdBankRegisterRequest = new HDBankRegisterRequest(new Request(), hdBankRegisterdata);
-        return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(hdBankRegisterRequest, getDefaultHeader()), RegisterResponse.class);
+        RegisterRequest registerRequest = new RegisterRequest(new Request(), registerdata);
+        return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(registerRequest, getDefaultHeader()), RegisterResponse.class);
     }
 
     @Override
-    public ResponseEntity<?> ChangePasswordHDBankAccount(HDBankChangePasswordRequestData hdBankChangePasswordRequestData) {
-        return null;
+    public ResponseEntity<ChangePasswordResponse> ChangePasswordHDBankAccount(ChangePasswordRequest changePasswordRequest) {
+        RestTemplate restTemplate = new RestTemplate();
+        String registerURL = hdBankConfig.getHDBankOpenApiBaseURL() + "/change_password";
+        return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(changePasswordRequest, getDefaultHeader()), ChangePasswordResponse.class);
     }
 
     @Override
-    public ResponseEntity<?> transferHDBankAccount(HDBankTransferRequestData hdBankTransferRequestData) {
-        return null;
+    public ResponseEntity<TransferResponse> transferHDBankAccount(TransferRequest transferRequest) {
+        RestTemplate restTemplate = new RestTemplate();
+        String registerURL = hdBankConfig.getHDBankOpenApiBaseURL() + "/transfer";
+        return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(transferRequest, getDefaultHeader()), TransferResponse.class);
     }
 
     @Override
-    public ResponseEntity<?> getBalanceHDBankAccount(HDBankBalanceRequestData hdBankBalanceRequestData) {
-        return null;
+    public ResponseEntity<BalanceResponse> getBalanceHDBankAccount(BalanceRequest balanceRequest) {
+        RestTemplate restTemplate = new RestTemplate();
+        String registerURL = hdBankConfig.getHDBankOpenApiBaseURL() + "/balance";
+        return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(balanceRequest, getDefaultHeader()), BalanceResponse.class);
     }
 
     @Override
-    public ResponseEntity<?> getTransferHistoryHDBankAccount(HDBankTransHisRequestData hdBankTransHisRequestData) {
-        return null;
+    public ResponseEntity<TransHisResponse> getTransferHistoryHDBankAccount(TransferHistoryRequest transferHistoryRequest) {
+        RestTemplate restTemplate = new RestTemplate();
+        String registerURL = hdBankConfig.getHDBankOpenApiBaseURL() + "/tranhis";
+        return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(transferHistoryRequest, getDefaultHeader()), TransHisResponse.class);
     }
 
     @Override
-    public ResponseEntity<?> getTuitionList(HDBankTuitionListRequestData hdBankTuitionListRequestData) {
-        return null;
+    public ResponseEntity<TuitionListResponse> getTuitionList(TuitionListRequest tuitionListRequest) {
+        RestTemplate restTemplate = new RestTemplate();
+        String registerURL = hdBankConfig.getHDBankOpenApiBaseURL() + "/getpayment";
+        return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(tuitionListRequest, getDefaultHeader()), TuitionListResponse.class);
     }
 
     @Override
-    public ResponseEntity<?> paymentTuition(HDBankPaymentTuitionRequestData hdBankPaymentTuitionRequestData) {
-        return null;
+    public ResponseEntity<PaymentTuitionResponse> paymentTuition(TuitionPaymentRequest tuitionPaymentRequest) {
+        RestTemplate restTemplate = new RestTemplate();
+        String registerURL = hdBankConfig.getHDBankOpenApiBaseURL() + "/getpayment";
+        return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(tuitionPaymentRequest, getDefaultHeader()), PaymentTuitionResponse.class);
     }
 }
