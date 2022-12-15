@@ -1,7 +1,7 @@
 package com.volunteer.springbootmongo.HDBank.SpringWebClient.HDBankRequest;
 
 import com.volunteer.springbootmongo.HDBank.Interface.HDBankRequestInterface;
-import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Data.HDBankRegisterData;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Data.*;
 import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.HDBankRegisterRequest;
 import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Login;
 import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Request;
@@ -111,5 +111,35 @@ public class HDBankRequest implements HDBankRequestInterface {
         String registerURL = hdBankConfig.getHDBankOpenApiBaseURL() + "/register";
         HDBankRegisterRequest hdBankRegisterRequest = new HDBankRegisterRequest(new Request(), hdBankRegisterdata);
         return restTemplate.exchange(registerURL, HttpMethod.POST, new HttpEntity<>(hdBankRegisterRequest, getDefaultHeader()), RegisterResponse.class);
+    }
+
+    @Override
+    public ResponseEntity<?> ChangePasswordHDBankAccount(HDBankChangePasswordRequestData hdBankChangePasswordRequestData) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<?> transferHDBankAccount(HDBankTransferRequestData hdBankTransferRequestData) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<?> getBalanceHDBankAccount(HDBankBalanceRequestData hdBankBalanceRequestData) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<?> getTransferHistoryHDBankAccount(HDBankTransHisRequestData hdBankTransHisRequestData) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<?> getTuitionList(HDBankTuitionListRequestData hdBankTuitionListRequestData) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<?> paymentTuition(HDBankPaymentTuitionRequestData hdBankPaymentTuitionRequestData) {
+        return null;
     }
 }

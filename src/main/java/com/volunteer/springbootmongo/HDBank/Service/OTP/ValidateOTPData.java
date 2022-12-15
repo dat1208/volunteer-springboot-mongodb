@@ -16,10 +16,10 @@ import java.util.Date;
 @Data
 public class ValidateOTPData {
     private String OTP;
-    private HDBankAccount data;
-    private Date expiredTime = new Date(System.currentTimeMillis() + 180_000); // 3 minutes
-
-    public ValidateOTPData(String OTP, HDBankAccount data) {
+    private Object data;
+    private Date expiredTime = new Date(System.currentTimeMillis() + 300_000); // 5 minutes
+    private int resendTime = 5;
+    public ValidateOTPData(String OTP, Object data) {
         this.OTP = OTP;
         this.data = data;
     }
