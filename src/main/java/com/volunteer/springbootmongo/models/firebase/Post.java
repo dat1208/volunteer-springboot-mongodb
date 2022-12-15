@@ -6,10 +6,16 @@ import lombok.Data;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class Post {
     public enum type{TN, QG, HP}
+
+    private String Owner;
+
+    private String nameOwner;
+    private String avtOwner;
     private String id;
     private String content;
     private String datecreated;
@@ -28,6 +34,40 @@ public class Post {
     private int totalUsers;
 
     private int currentUsers;
+
+    private List<String> avtCurrentUsers;
+
+    public String getNameOwner() {
+        return nameOwner;
+    }
+
+    public void setNameOwner(String nameOwner) {
+        this.nameOwner = nameOwner;
+    }
+
+    public String getOwner() {
+        return Owner;
+    }
+
+    public void setOwner(String owner) {
+        Owner = owner;
+    }
+
+    public String getAvtOwner() {
+        return avtOwner;
+    }
+
+    public void setAvtOwner(String avtOwner) {
+        this.avtOwner = avtOwner;
+    }
+
+    public List<String> getAvtCurrentUsers() {
+        return avtCurrentUsers;
+    }
+
+    public void setAvtCurrentUsers(List<String> avtCurrentUsers) {
+        this.avtCurrentUsers = avtCurrentUsers;
+    }
 
     public String getAddress() {
         return address;
