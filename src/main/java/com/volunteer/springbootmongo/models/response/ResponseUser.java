@@ -11,6 +11,8 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseUser {
 
+    @JsonProperty("_id")
+    private String _id;
     @JsonProperty("firstname")
     private String firstname;
     @JsonProperty("lastname")
@@ -35,7 +37,8 @@ public class ResponseUser {
     @JsonProperty("address")
     private String address;
 
-    public ResponseUser(String firstname, String lastname, Date birth, String email, String phonenumber, String avatar, String cover, String gender, String address) {
+    public ResponseUser(String _id,String firstname, String lastname, Date birth, String email, String phonenumber, String avatar, String cover, String gender, String address) {
+        this._id = _id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.birth = birth;
@@ -51,6 +54,14 @@ public class ResponseUser {
         this.lastname = lastname;
         this.email = email;
         this.phonenumber = phonenumber;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
     public Date getBirth() {
@@ -99,6 +110,7 @@ public class ResponseUser {
 
 
     public ResponseUser(ResponseUser responseUser) {
+        this._id = responseUser._id;
         this.firstname = responseUser.firstname;
         this.lastname = responseUser.lastname;
         this.birth = responseUser.birth;

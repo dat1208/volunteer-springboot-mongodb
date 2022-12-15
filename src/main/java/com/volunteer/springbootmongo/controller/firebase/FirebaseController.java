@@ -23,11 +23,13 @@ public class FirebaseController {
     public ResponseObject savePost(@RequestParam("file") MultipartFile file,
                                    @RequestParam(name = "title") String title,
                                    @RequestParam(name = "content") String content,
-                                   @RequestParam(name = "subtitle") String subtitle,
+                                   @RequestParam(name = "subtitle",required = false) String subtitle,
                                    @RequestParam(name = "type") Post.type type,
-                                   @RequestParam(name = "address") String address, HttpServletRequest request) throws Exception {
+                                   @RequestParam(name = "address") String address,
+                                   @RequestParam(name = "totalUsers",required = false,defaultValue = "0") int totalUsers,
+                                   @RequestParam(name = "totalMoney",required = false,defaultValue = "0") int totalMoney, HttpServletRequest request) throws Exception {
 
-        return postService.savePost(new Post(content,title,subtitle,address, type),file,request);
+        return postService.savePost(new Post(content,title,subtitle,address, type,totalMoney,totalUsers),file,request);
     }
 
     @GetMapping("/post/{name}")
@@ -37,5 +39,9 @@ public class FirebaseController {
     @GetMapping("/post/getAll")
     public List<Post> getAll() throws ExecutionException, InterruptedException {
         return postService.getAll();
+    }
+    @PostMapping("/post/join")
+    public ResponseObject join(@RequestBody String request) throws ExecutionException, InterruptedException {
+        return new ResponseObject();
     }
 }

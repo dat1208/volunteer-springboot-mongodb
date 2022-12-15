@@ -200,6 +200,7 @@ public class UserService {
         if(emailVal(userName)){
             User user = new User();
             userRepository.findUserByEmail(userName).ifPresent(u -> {
+                user.set_id(u.get_id());
                 user.setPwd(u.getPwd());
                 user.setFirstname(u.getFirstname());
                 user.setEmail(u.getEmail());
@@ -211,7 +212,7 @@ public class UserService {
                 user.setCover(u.getCover());
                 user.setBirth(u.getBirth());
             });
-            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(), user.getBirth(),user.getEmail(),
+            ResponseUser responseUser = new ResponseUser(user.get_id().toString(),user.getFirstname(),user.getLastname(), user.getBirth(),user.getEmail(),
                     user.getPhonenumber(), user.getAvatar(), user.getCover(),Gender(user.getGender()),user.getAddress());
             return new ResponseUser(responseUser);
         }
@@ -220,6 +221,7 @@ public class UserService {
             User user = new User();
 
             userRepository.findUserByPhonenumber(userName).ifPresent(u -> {
+                user.set_id(u.get_id());
                 user.setPwd(u.getPwd());
                 user.setFirstname(u.getFirstname());
                 user.setEmail(u.getEmail());
@@ -231,7 +233,7 @@ public class UserService {
                 user.setCover(u.getCover());
                 user.setBirth(u.getBirth());
             });
-            ResponseUser responseUser = new ResponseUser(user.getFirstname(),user.getLastname(), user.getBirth(),user.getEmail(),
+            ResponseUser responseUser = new ResponseUser(user.get_id().toString(),user.getFirstname(),user.getLastname(), user.getBirth(),user.getEmail(),
                     user.getPhonenumber(), user.getAvatar(), user.getCover(),Gender(user.getGender()),user.getAddress());
             return new ResponseUser(responseUser);
         }
