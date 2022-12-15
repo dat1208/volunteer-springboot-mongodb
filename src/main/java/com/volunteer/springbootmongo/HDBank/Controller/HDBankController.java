@@ -38,9 +38,12 @@ public class HDBankController {
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody AppsChangePasswordRequestData appsChangePasswordRequestData) {
-        System.out.println(appsChangePasswordRequestData);
         return hdBankService.changePasswordHDBankAccount(appsChangePasswordRequestData);
     }
 
+    @PostMapping("/get-balance")
+    public ResponseEntity<?> getBalance(@RequestBody AppsGetBalanceRequest appsGetBalanceRequest) {
+        return hdBankService.getBalance(appsGetBalanceRequest);
+    }
 
 }

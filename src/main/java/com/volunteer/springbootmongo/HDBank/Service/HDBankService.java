@@ -82,7 +82,6 @@ public class HDBankService implements HDBankUserInterface {
         }
         return credential;
     }
-
     private String getJsonFromObject(Object object) {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -94,7 +93,6 @@ public class HDBankService implements HDBankUserInterface {
         }
         return "";
     }
-
     public ResponseEntity<?> sendOTP(String clientID, String phone, Object data) {
         OTPResponse otpResponse = twilioOTPService.sendOTPPhone(clientID, phone, data);
 
@@ -106,7 +104,6 @@ public class HDBankService implements HDBankUserInterface {
         }
         return ResponseEntity.status(HttpStatus.OK).body(verifyMessage);
     }
-
     public ResponseEntity<?> LinkHDBankAccount(AppsLoginRequestData AppsLoginRequestData) {
         Map<String, Object> ResponseMessage = new HashMap<>();
 
@@ -142,7 +139,6 @@ public class HDBankService implements HDBankUserInterface {
         ResponseMessage.put("message", Message.link_HDBank_account_failure_username_or_password_were_wrong);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage);
     }
-
     public boolean storedHDBankAccount(String clientID, HDBankAccount hdBankAccount) {
         try {
             Optional<User> userStored = userRepository.findById(clientID).stream().findFirst();
@@ -164,7 +160,6 @@ public class HDBankService implements HDBankUserInterface {
         }
         return true;
     }
-
     public ResponseEntity<?> verifyOTP(AppsOTPVerifyRequestData appsOtpVerifyRequestData) {
 
         OTPValidated otpValidated = twilioOTPService.validateOTP(appsOtpVerifyRequestData.getOTP(), appsOtpVerifyRequestData.getClientID());
@@ -182,7 +177,6 @@ public class HDBankService implements HDBankUserInterface {
         responseMessage.put("response", otpValidated.getOtpResponse());
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
-
     @Override
     public ResponseEntity<?> registerHDBankAccount(AppsRegisterRequestData appsRegisterRequestData) {
         // Validate này kia;
@@ -224,14 +218,12 @@ public class HDBankService implements HDBankUserInterface {
         }
         return ResponseEntity.status(HttpStatus.OK).body(registerResponse.getBody());
     }
-
     public ResponseEntity<?> resendOTP(AppsResendOTPRequestData appsResendOTPRequestData) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 twilioOTPService.resendOTPPhone(
                         appsResendOTPRequestData.getClientID(),
                         appsResendOTPRequestData.getPhone()));
     }
-
     public ResponseEntity<?> changePasswordHDBankAccount(AppsChangePasswordRequestData appsChangePasswordRequestData) {
         AppsChangePasswordResponse appsChangePasswordResponse = new AppsChangePasswordResponse();
         appsChangePasswordResponse.setData(
@@ -309,5 +301,9 @@ public class HDBankService implements HDBankUserInterface {
             appsChangePasswordResponse.setResponse(new Response(Status.SUCCESS, Message.change_password_success_login_again_please));
         }
         return ResponseEntity.status(HttpStatus.OK).body(appsChangePasswordResponse);
+    }
+
+    public ResponseEntity<?> getBalance(AppsGetBalanceRequest appsGetBalanceRequest) {
+        return null;
     }
 }
