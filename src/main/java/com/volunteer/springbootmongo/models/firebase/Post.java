@@ -18,7 +18,72 @@ public class Post {
     private String mainimage;
     private String address;
     private type type;
+
     private String timeago;
+
+    private int totalMoney;
+
+    private int currentMoney;
+
+    private int totalUsers;
+
+    private int currentUsers;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Post.type getType() {
+        return type;
+    }
+
+    public void setType(Post.type type) {
+        this.type = type;
+    }
+
+    public String getTimeago() {
+        return timeago;
+    }
+
+    public void setTimeago(String timeago) {
+        this.timeago = timeago;
+    }
+
+    public int getTotalMoney() {
+        return totalMoney;
+    }
+
+    public void setTotalMoney(int totalMoney) {
+        this.totalMoney = totalMoney;
+    }
+
+    public int getCurrentMoney() {
+        return currentMoney;
+    }
+
+    public void setCurrentMoney(int currentMoney) {
+        this.currentMoney = currentMoney;
+    }
+
+    public int getTotalUsers() {
+        return totalUsers;
+    }
+
+    public void setTotalUsers(int totalUsers) {
+        this.totalUsers = totalUsers;
+    }
+
+    public int getCurrentUsers() {
+        return currentUsers;
+    }
+
+    public void setCurrentUsers(int currentUsers) {
+        this.currentUsers = currentUsers;
+    }
 
     public String getId() {
         return id;
@@ -68,12 +133,22 @@ public class Post {
         this.mainimage = mainimage;
     }
 
-    public Post(String content, String title, String subtitle, String address, Post.type type) {
+    public Post(String content, String title, String subtitle, String address ) {
         this.content = content;
         this.title = title;
         this.subtitle = subtitle;
         this.address = address;
         this.type = type;
+    }
+
+    public Post(String content, String title, String subtitle, String address, Post.type type, int totalMoney, int totalUsers) {
+        this.content = content;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.address = address;
+        this.type = type;
+        this.totalMoney = totalMoney;
+        this.totalUsers = totalUsers;
     }
 
     public Post() {}
