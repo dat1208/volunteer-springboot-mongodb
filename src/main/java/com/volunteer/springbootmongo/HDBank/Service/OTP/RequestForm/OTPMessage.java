@@ -8,7 +8,9 @@ public enum OTPMessage {
     send_OTP_successfully_waiting_for_validate,
     send_OTP_failure_please_resend,
     validate_OTP_success,
-    validate_OTP_failure,
-    validate_OTP_failure_please_resend_new_OTP,
+    the_OTP_is_wrong_format,
+    OTP_not_match_try_again,
     the_OTP_timeout_please_resend_new_OTP,
+
+    current_request_is_limit_resend_OTP
 }
