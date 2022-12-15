@@ -7,11 +7,16 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.volunteer.springbootmongo.models.firebase.Post;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
 import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
+import com.volunteer.springbootmongo.service.jwt.JwtUserDetailsService;
+import com.volunteer.springbootmongo.service.user.UserService;
+import org.bson.json.JsonObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -24,7 +29,13 @@ public class PostService {
 
     @Autowired
     private UploadService uploadService;
-    public ResponseObject savePost(Post post, MultipartFile file) throws ExecutionException, InterruptedException, IOException {
+
+    @Autowired
+    private JwtUserDetailsService jwtUserDetailsService;
+
+    @Autowired
+    private UserService userService;
+    public ResponseObject savePost(Post post, MultipartFile file, HttpServletRequest request) throws Exception {
 
 
         Firestore dbFileStore = FirestoreClient.getFirestore();
@@ -33,12 +44,15 @@ public class PostService {
       ApiFuture<DocumentReference> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME).add(post);
       String id = collectionApiFuture.get().getId();
       String url = uploadService.uploadPostImage(file,id);
-      post.setMainimage(url);
-      post.setId(id);
-      Long dateTime = System.currentTimeMillis();
-      post.setDatecreated(dateTime.toString());
-      post.setType(Post.type.QG);
+          post.setMainimage(url);
+          post.setId(id);
+          Long dateTime = System.currentTimeMillis();
+          post.setDatecreated(dateTime.toString());
+          post.setType(Post.type.QG);
       collectionApiFuture.get().set(post);
+      //Append post to users
+      String username = jwtUserDetailsService.getUsernameByToken(request);
+      userService.insertPost(id,username);
       return new ResponseObject(HttpStatus.CREATED.toString(),post);
     }
 
@@ -86,6 +100,7 @@ public class PostService {
     public List<Post> getAll() throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
         CollectionReference posts = dbFileStore.collection(COLLECTION_NAME);
-        return  posts.get().get().toObjects(Post.class);
+        List<Post> listPost = posts.get().get().toObjects(Post.class).stream().toList();
+        return  listPost;
     }
 }
