@@ -6,5 +6,7 @@ package com.volunteer.springbootmongo.HDBank.AppsClient.ClientResponse;
  */
 public enum Message {
     link_HDBank_account_failure_username_or_password_were_wrong,
-    this_HDBank_account_linked_please_choose_another_account
+    this_HDBank_account_linked_please_choose_another_account,
+    current_user_is_limit_link_bank_account,
+    the_Phone_number_is_wrong_format,
 }
