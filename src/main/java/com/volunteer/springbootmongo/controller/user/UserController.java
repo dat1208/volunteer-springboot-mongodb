@@ -47,4 +47,8 @@ public class UserController {
     public ResponseEntity<ResponseObject> update(@RequestBody UpdateForm updateForm){
         return new ResponseEntity<>(userService.update(updateForm),HttpStatus.OK);
     }
+    @GetMapping("/users/getStories")
+    public ResponseEntity<ResponseObject> getStories(){
+        return new ResponseEntity<>(userService.getStories(),HttpStatus.OK);
+    }
 }

@@ -41,7 +41,7 @@ public class FirebaseController {
         return postService.getAll();
     }
     @PostMapping("/post/join")
-    public ResponseObject join(@RequestBody String request) throws ExecutionException, InterruptedException {
-        return new ResponseObject();
+    public ResponseObject join(@RequestParam(name = "idPost") String idPost, HttpServletRequest request) throws Exception {
+        return postService.join(idPost,request);
     }
 }
