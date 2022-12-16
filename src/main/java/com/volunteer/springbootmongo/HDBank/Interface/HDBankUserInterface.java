@@ -1,7 +1,7 @@
 package com.volunteer.springbootmongo.HDBank.Interface;
 
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.HDBankAccountRequestData;
-import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.HDBankRegister;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.AppsLoginRequestData;
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.AppsRegisterRequestData;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -9,6 +9,6 @@ import org.springframework.http.ResponseEntity;
  * @project volunteer-springboot-mongodb
  */
 public interface HDBankUserInterface {
-    ResponseEntity<?> LinkHDBankAccount(HDBankAccountRequestData HDBankAccountRequestData);
-    ResponseEntity<?>  registerHDBankAccount(HDBankRegister hdBankRegister);
+    ResponseEntity<?> LinkHDBankAccount(AppsLoginRequestData AppsLoginRequestData);
+    ResponseEntity<?>  registerHDBankAccount(AppsRegisterRequestData appsRegisterRequestData);
 }

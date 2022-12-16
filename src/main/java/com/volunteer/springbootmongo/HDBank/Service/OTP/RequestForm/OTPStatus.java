@@ -5,5 +5,5 @@ package com.volunteer.springbootmongo.HDBank.Service.OTP.RequestForm;
  * @project volunteer-springboot-mongodb
  */
 public enum OTPStatus {
-    DELIVERED, FAILED, SUCCESS, TIMEOUT, WRONG_FORMAT, LIMIT_RESEND_TIME
+    DELIVERED, FAILED, SUCCESS, TIMEOUT, WRONG_FORMAT, LIMIT_RESEND_TIME, NOT_FOUND_TRANSACTION
 }

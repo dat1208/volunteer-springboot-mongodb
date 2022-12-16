@@ -34,11 +34,14 @@ public class TwilioOTPService {
     private static final String REGION_PHONE_NUMBER_VIE = "+84";
     Map<String, ValidateOTPData> OTPMap = new HashMap<>();
 
-    //   Send OTP and Refresh OTP There;
     private String getPhoneFormat(String phone) {
         return REGION_PHONE_NUMBER_VIE + phone.substring(1);
     }
+    //TODO: Implement limit resend otp per phone - not client id;
     public OTPResponse resendOTPPhone(String clientID, String phoneNumber) {
+        if(OTPMap.get(clientID) == null) {
+            return new OTPResponse(OTPStatus.NOT_FOUND_TRANSACTION, OTPMessage.can_not_found_transaction_otp_validation, 0);
+        }
         try {
             int resendTime = OTPMap.get(clientID).getResendTime();
             if(resendTime > 0) {
@@ -50,6 +53,7 @@ public class TwilioOTPService {
                 return new OTPResponse(OTPStatus.LIMIT_RESEND_TIME, OTPMessage.current_request_is_limit_resend_OTP, 0);
             }
         } catch (Exception ex) {
+            LOGGER.error("Exception Twilio: {}", ex);
             return new OTPResponse(OTPStatus.FAILED, OTPMessage.send_OTP_failure_please_resend, 0);
         }
         return new OTPResponse(OTPStatus.DELIVERED, OTPMessage.send_OTP_successfully_waiting_for_validate, 300);
