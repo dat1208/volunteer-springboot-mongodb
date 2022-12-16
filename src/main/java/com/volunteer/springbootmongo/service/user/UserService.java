@@ -1,5 +1,9 @@
 package com.volunteer.springbootmongo.service.user;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.FirestoreClient;
 import com.volunteer.springbootmongo.models.LoginForm;
 import com.volunteer.springbootmongo.models.RegisterForm;
 import com.volunteer.springbootmongo.models.UpdateForm;
@@ -19,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -366,5 +371,15 @@ public class UserService {
         String blob = users_folder+"/"+username+"/"+cover;
         String url = "https://storage.googleapis.com/volunteer-app-c93c9.appspot.com/"+blob;
         return url;
+    }
+
+    public ResponseObject getStories() {
+        List<User> userList = userRepository.findAll().stream().toList();
+        List<String> stories = new ArrayList<>();
+        for (User user:
+             userList) {
+            stories.add(getAvatar(user.getEmail()));
+        }
+        return new ResponseObject(HttpStatus.OK.toString(),stories);
     }
 }
