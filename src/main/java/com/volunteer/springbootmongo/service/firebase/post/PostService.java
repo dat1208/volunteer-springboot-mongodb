@@ -191,6 +191,6 @@ public class PostService {
                 post.setAvtCurrentUsers(getAvtCurrentUsers(post.getId()));
             }
         }
-        return  posts.get().get().toObjects(Post.class).stream().toList();
+        return  listPost;
     }
 }
