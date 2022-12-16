@@ -10,7 +10,6 @@ import com.volunteer.springbootmongo.models.response.ResponseObject;
 import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
 import com.volunteer.springbootmongo.service.jwt.JwtUserDetailsService;
 import com.volunteer.springbootmongo.service.user.UserService;
-import org.bson.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -144,8 +143,6 @@ public class PostService {
         ApiFuture<WriteResult> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(id).create(tnPost);
 
     }
-
-
     public int getCurrentUsers(String idPost) throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
@@ -160,7 +157,6 @@ public class PostService {
             return 0;
         return (int) listUsers.stream().count();
     }
-
     public List<String> getAvtCurrentUsers(String idPost){
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
@@ -195,6 +191,6 @@ public class PostService {
                 post.setAvtCurrentUsers(getAvtCurrentUsers(post.getId()));
             }
         }
-        return  listPost;
+        return  posts.get().get().toObjects(Post.class).stream().toList();
     }
 }
