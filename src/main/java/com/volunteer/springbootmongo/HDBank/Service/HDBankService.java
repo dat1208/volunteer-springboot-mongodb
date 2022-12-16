@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
@@ -63,6 +64,11 @@ public class HDBankService implements HDBankUserInterface {
     private ValidateService validateService;
     @Autowired
     UserService userService;
+    @Scheduled(fixedDelay = 180000)
+    public void refreshTokenTask() {
+        LOGGER.info("TASK REFRESH TOKEN RUNNING - CALL NEW ACCESS TOKEN");
+        hdBankRequest.getAccessToken();
+    }
 
     private String credential(String message) {
         if (hdBankConfig.getPublicKey().equals("")) {

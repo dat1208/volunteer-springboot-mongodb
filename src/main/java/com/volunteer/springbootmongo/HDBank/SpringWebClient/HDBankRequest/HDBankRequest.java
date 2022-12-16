@@ -48,7 +48,8 @@ public class HDBankRequest implements HDBankRequestInterface {
                 restTemplate.exchange(hdBankConfig.getHDBankOpenAPIOauthBaseURL(), HttpMethod.POST, httpEntity, RefreshTokenResponse.class);
 
         if (response.getStatusCode() == HttpStatus.OK && response.hasBody()) {
-
+            hdBankConfig.setHDBankOpenApiAccessToken(response.getBody().getId_token());
+            System.out.println(response.getBody().getAccess_token());
         } else if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
             //TODO: Login Đạt RefreshToken;
         }
