@@ -376,10 +376,7 @@ public class UserService {
     public ResponseObject getStories() {
         List<User> userList = userRepository.findAll().stream().toList();
         List<String> stories = new ArrayList<>();
-        for (User user:
-             userList) {
-            stories.add(getAvatar(user.getEmail()));
-        }
+
         return new ResponseObject(HttpStatus.OK.toString(),stories);
     }
 }
