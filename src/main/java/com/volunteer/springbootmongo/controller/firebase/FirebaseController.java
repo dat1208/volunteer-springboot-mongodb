@@ -40,6 +40,11 @@ public class FirebaseController {
     public List<Post> getAll() throws ExecutionException, InterruptedException {
         return postService.getAll();
     }
+    @GetMapping("/post/getpost")
+    public List<Post> getpost(@RequestParam(name = "limit") int limit,
+                              @RequestParam(name = "begin") int begin) throws ExecutionException, InterruptedException {
+        return postService.getpost(limit,begin);
+    }
     @PostMapping("/post/join")
     public ResponseObject join(@RequestParam(name = "idPost") String idPost, HttpServletRequest request) throws Exception {
         return postService.join(idPost,request);

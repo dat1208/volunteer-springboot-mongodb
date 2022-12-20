@@ -1,6 +1,9 @@
 package com.volunteer.springbootmongo.HDBank.Interface;
 
+import com.volunteer.springbootmongo.HDBank.AppsClient.ClientRequest.AppsChangePasswordRequestData;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.*;
 import com.volunteer.springbootmongo.HDBank.SpringWebClient.RequestForm.Data.*;
+import com.volunteer.springbootmongo.HDBank.SpringWebClient.ResponseForm.Responses.*;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -11,11 +14,11 @@ public interface HDBankRequestInterface {
     void getHDBankPublicKey();
     void getAccessToken();
     String linkClient(String credential);
-    ResponseEntity<?> register(HDBankRegisterData hdBankRegisterData);
-    ResponseEntity<?> ChangePasswordHDBankAccount(HDBankChangePasswordRequestData hdBankChangePasswordRequestData);
-    ResponseEntity<?> transferHDBankAccount(HDBankTransferRequestData hdBankTransferRequestData);
-    ResponseEntity<?> getBalanceHDBankAccount(HDBankBalanceRequestData hdBankBalanceRequestData);
-    ResponseEntity<?> getTransferHistoryHDBankAccount(HDBankTransHisRequestData hdBankTransHisRequestData);
-    ResponseEntity<?> getTuitionList(HDBankTuitionListRequestData hdBankTuitionListRequestData);
-    ResponseEntity<?> paymentTuition(HDBankPaymentTuitionRequestData hdBankPaymentTuitionRequestData);
+    ResponseEntity<?> register(RegisterData registerData);
+    ResponseEntity<?> ChangePasswordHDBankAccount(ChangePasswordRequest changePasswordRequest);
+    ResponseEntity<TransferResponse> transferHDBankAccount(TransferRequest transferRequest);
+    ResponseEntity<BalanceResponse> getBalanceHDBankAccount(BalanceRequest balanceRequest);
+    ResponseEntity<TransHisResponse> getTransferHistoryHDBankAccount(TransferHistoryRequest transferHistoryRequest);
+    ResponseEntity<TuitionListResponse> getTuitionList(TuitionListRequest tuitionListRequest);
+    ResponseEntity<PaymentTuitionResponse> paymentTuition(TuitionPaymentRequest tuitionPaymentRequest);
 }

@@ -13,33 +13,37 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/HDBank")
 public class HDBankController {
-    /* POST: /api/HDBank/link {clientID, username, passwork}
-    *
-    * */
-
     @Autowired
     private HDBankService hdBankService;
+
     @PostMapping("/link")
-    public ResponseEntity<?> link(@RequestBody HDBankAccountRequestData HDBankAccountRequestData) {
-        return hdBankService.LinkHDBankAccount(HDBankAccountRequestData);
+    public ResponseEntity<?> link(@RequestBody AppsLoginRequestData AppsLoginRequestData) {
+        return hdBankService.LinkHDBankAccount(AppsLoginRequestData);
     }
+
     @PostMapping("/verify")
-    public ResponseEntity<?> verify(@RequestBody OTPVerifyRequestData otpVerifyRequestData) {
-        return hdBankService.verifyOTP(otpVerifyRequestData);
+    public ResponseEntity<?> verify(@RequestBody AppsOTPVerifyRequestData appsOtpVerifyRequestData) {
+        return hdBankService.verifyOTP(appsOtpVerifyRequestData);
     }
+
     @PostMapping("/resend-otp")
-    public ResponseEntity<?> resendOTP(@RequestBody HDBankResendOTPRequestData hdBankResendOTPRequestData) {
-        return hdBankService.resendOTP(hdBankResendOTPRequestData);
+    public ResponseEntity<?> resendOTP(@RequestBody AppsResendOTPRequestData appsResendOTPRequestData) {
+        return hdBankService.resendOTP(appsResendOTPRequestData);
     }
+
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody HDBankRegister hdBankRegister) {
-        return hdBankService.registerHDBankAccount(hdBankRegister);
+    public ResponseEntity<?> register(@RequestBody AppsRegisterRequestData appsRegisterRequestData) {
+        return hdBankService.registerHDBankAccount(appsRegisterRequestData);
     }
+
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody HDBankChangePasswordRequestData hdBankChangePasswordRequestData) {
-        // Check OLD password;
-        // if old passsword oke - > Change then response;
-        return null;
+    public ResponseEntity<?> changePassword(@RequestBody AppsChangePasswordRequestData appsChangePasswordRequestData) {
+        return hdBankService.changePasswordHDBankAccount(appsChangePasswordRequestData);
+    }
+
+    @PostMapping("/get-balance")
+    public ResponseEntity<?> getBalance(@RequestBody AppsGetBalanceRequest appsGetBalanceRequest) {
+        return hdBankService.getBalance(appsGetBalanceRequest);
     }
 
 

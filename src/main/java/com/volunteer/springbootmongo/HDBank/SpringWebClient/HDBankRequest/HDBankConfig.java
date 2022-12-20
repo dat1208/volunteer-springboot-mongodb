@@ -24,7 +24,6 @@ public class HDBankConfig {
     @Value("${hdBank.env.client-id}")
     private String HDBankClientID;
 
-    @Value("${hdBank.env.access-token}")
     private String HDBankOpenApiAccessToken;
 
     @Value("${hdBank.env.refresh-token}")

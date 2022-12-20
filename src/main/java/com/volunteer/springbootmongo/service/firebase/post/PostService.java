@@ -193,4 +193,29 @@ public class PostService {
         }
         return  listPost;
     }
+
+    public List<Post> getpost(int limit, int begin) throws ExecutionException, InterruptedException {
+        Firestore dbFileStore = FirestoreClient.getFirestore();
+        CollectionReference posts = dbFileStore.collection(COLLECTION_NAME_POST);
+        List<Post> listPost = posts.get().get().toObjects(Post.class).stream().toList();
+        for (Post post:listPost) {
+            if(post.getDatecreated() != null)
+                post.setTimeago(calTimeAgo(Long.valueOf((post.getDatecreated()))));
+            if(post.getType().equals(Post.type.TN)){
+                post.setCurrentUsers(getCurrentUsers(post.getId()));
+                post.setAvtCurrentUsers(getAvtCurrentUsers(post.getId()));
+            }
+        }
+        if(listPost.size() < begin || listPost.size() < begin+limit)
+            return listPost;
+        else {
+            List<Post> listlimit = new ArrayList<>();
+            int count = 0;
+
+            for (int i = begin; i < begin+limit; i++) {
+                listlimit.add(listPost.get(i));
+            }
+            return listlimit;
+        }
+    }
 }

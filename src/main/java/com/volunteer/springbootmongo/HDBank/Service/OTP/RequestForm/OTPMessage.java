@@ -11,6 +11,6 @@ public enum OTPMessage {
     the_OTP_is_wrong_format,
     OTP_not_match_try_again,
     the_OTP_timeout_please_resend_new_OTP,
-
-    current_request_is_limit_resend_OTP
+    current_request_is_limit_resend_OTP,
+    can_not_found_transaction_otp_validation
 }
