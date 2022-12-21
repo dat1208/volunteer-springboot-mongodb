@@ -47,24 +47,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
     @Autowired
     private OAuth2FailureHandler oAuth2FailureHandler;
     @Autowired
     private OAuth2SuccessHandler oAuth2SuccessHandler;
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        // We don't need CSRF for this example
-        httpSecurity.csrf().disable()
-                // dont authenticate this particular request
-                .authorizeRequests().antMatchers("/authenticate","/api/v1/users/register",
-                        "/api/v2/users/auth","/api/v1/users/auth").permitAll()
-                // all other requests need to be authenticated
-                .anyRequest().authenticated().and().
-                // make sure we use stateless session; session won't be used to
-                // store user's state.
-                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().oauth2Login().successHandler(oAuth2SuccessHandler).failureHandler(oAuth2FailureHandler);
+        httpSecurity.csrf().disable();
+
+        final String[] antMatcherURL= {
+                // Authorize
+                "/authenticate",
+                "/api/v1/users/register",
+                "/api/v2/users/auth",
+                "/api/v1/users/auth",
+                // Service
+                "/api/firebase/post/getpost"
+        };
+
+        httpSecurity.authorizeRequests()
+                .antMatchers(antMatcherURL).permitAll()
+                .anyRequest().authenticated()
+                .and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().oauth2Login()
+                    .successHandler(oAuth2SuccessHandler)
+                    .failureHandler(oAuth2FailureHandler);
 
         // Add a filter to validate the tokens with every request
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

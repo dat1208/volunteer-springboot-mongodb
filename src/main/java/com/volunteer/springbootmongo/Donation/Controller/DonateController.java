@@ -26,5 +26,4 @@ public class DonateController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-
 }
