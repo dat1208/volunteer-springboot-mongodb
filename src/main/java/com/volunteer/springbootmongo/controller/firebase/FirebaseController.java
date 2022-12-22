@@ -3,8 +3,10 @@ package com.volunteer.springbootmongo.controller.firebase;
 
 import com.volunteer.springbootmongo.models.firebase.Post;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
+import com.volunteer.springbootmongo.service.firebase.Activities.ActivitiesService;
 import com.volunteer.springbootmongo.service.firebase.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +20,8 @@ import java.util.concurrent.ExecutionException;
 public class FirebaseController {
     @Autowired
     private PostService postService;
-
+    @Autowired
+    private ActivitiesService activitiesService;
     @PostMapping("/post")
     public ResponseObject savePost(@RequestParam("file") MultipartFile file,
                                    @RequestParam(name = "title") String title,
@@ -46,7 +49,19 @@ public class FirebaseController {
         return postService.getpost(limit,begin);
     }
     @PostMapping("/post/join")
-    public ResponseObject join(@RequestParam(name = "idPost") String idPost, HttpServletRequest request) throws Exception {
+    public ResponseObject join(@RequestParam(name = "activitiesID") String idPost, HttpServletRequest request) throws Exception {
+        System.out.println(idPost);
         return postService.join(idPost,request);
+    }
+
+    @PostMapping("/post/getAct")
+    public ResponseEntity<?> getActivitiesCurrentUser(@RequestParam(name = "userID") String userID) {
+        try {
+            return activitiesService.getActivitiesCurrentUser(userID);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

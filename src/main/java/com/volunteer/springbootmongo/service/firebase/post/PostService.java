@@ -4,9 +4,11 @@ package com.volunteer.springbootmongo.service.firebase.post;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.volunteer.springbootmongo.models.data.User;
 import com.volunteer.springbootmongo.models.firebase.Post;
 import com.volunteer.springbootmongo.models.firebase.TNPost;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
+import com.volunteer.springbootmongo.repository.UserRepository;
 import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
 import com.volunteer.springbootmongo.service.jwt.JwtUserDetailsService;
 import com.volunteer.springbootmongo.service.user.UserService;
@@ -17,10 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
@@ -34,6 +36,8 @@ public class PostService {
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
@@ -91,7 +95,21 @@ public class PostService {
             initListUsers.add(username);
             ApiFuture<WriteResult> future = tnpostDoc.update("listUsers", initListUsers);
         }
-
+        // Store IDPost to userIN Mongo DB;
+        try {
+            User user = userRepository.findUserByEmail(username).get();
+            if(user.getIdActivitiesList() == null) {
+                List<String> activitiesList = new ArrayList<>();
+                activitiesList.add(idPost);
+                user.setIdActivitiesList(activitiesList);
+            }
+            else {
+                user.getIdActivitiesList().add(idPost);
+            }
+            userRepository.save(user);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
         return new ResponseObject(HttpStatus.OK.toString(), "successful");
     }
     public ResponseObject getPostDetail(String name) throws ExecutionException, InterruptedException {
