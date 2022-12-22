@@ -39,10 +39,6 @@ public class FirebaseController {
     public ResponseObject getPost(@PathVariable String name) throws ExecutionException, InterruptedException {
         return postService.getPostDetail(name);
     }
-    @GetMapping("/post/getAll")
-    public List<Post> getAll() throws ExecutionException, InterruptedException {
-        return postService.getAll();
-    }
     @GetMapping("/post/getpost")
     public List<Post> getpost(@RequestParam(name = "limit") int limit,
                               @RequestParam(name = "begin") int begin) throws ExecutionException, InterruptedException {

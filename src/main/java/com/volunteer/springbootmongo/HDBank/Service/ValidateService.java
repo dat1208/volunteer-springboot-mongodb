@@ -17,9 +17,8 @@ import java.util.Optional;
  * @author "KhaPhan" on 15-Dec-22
  * @project volunteer-springboot-mongodb
  */
-@Data
+
 @AllArgsConstructor
-@NoArgsConstructor
 @Service
 public class ValidateService {
     @Autowired
@@ -32,15 +31,15 @@ public class ValidateService {
         boolean isExistedLikedToBank = userStored.get().getHdBankAccountList() != null;
         if (isExistedLikedToBank) {
             if (userStored.get().getHdBankAccountList().size() >= 3) {
-                return false;
+                return true;
             }
             for (int index = 0; index < userStored.get().getHdBankAccountList().size(); index++) {
                 if (AccountNo.equals(userStored.get().getHdBankAccountList().get(index).getAccountNumber())) {
-                    return false;
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     public boolean isOverLinkedAccount(String clientID) {
