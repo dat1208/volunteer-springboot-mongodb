@@ -206,6 +206,7 @@ public class PostService {
             if(post.getType().equals(Post.type.QG)){
                 post.setCurrentMoney(getCurrentMoney(post.getId()));
             }
+            post.setIdOwner(userService.getId(post.getOwner()));
         }
         if(listPost.size() < begin || listPost.size() < begin+limit)
             return listPost;

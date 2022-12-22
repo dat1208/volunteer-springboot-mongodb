@@ -15,6 +15,8 @@ public class Post {
 
     private String Owner;
 
+    private String idOwner;
+
     private String nameOwner;
     private String avtOwner;
     private String id;
@@ -176,6 +178,14 @@ public class Post {
 
     public void setMainimage(String mainimage) {
         this.mainimage = mainimage;
+    }
+
+    public String getIdOwner() {
+        return idOwner;
+    }
+
+    public void setIdOwner(String idOwner) {
+        this.idOwner = idOwner;
     }
 
     public Post(String content, String title, String subtitle, String address ) {
