@@ -25,8 +25,20 @@ public class DonateModel {
     private List<DonateHistory> donateHistoryList = new ArrayList<>();
     private Date initTime = new Date();
     private Date endTime;
-    private int numberOfDonate;
+    private int numberOfDonate = donateHistoryList.size();
     private boolean isActive = true;
     private String shortDesc;
     private String longDesc;
+
+    public DonateModel(String postID, String organizationID, List<DonateHistory> donateHistoryList, Date initTime, Date endTime, int numberOfDonate, boolean isActive, String shortDesc, String longDesc) {
+        this.postID = postID;
+        this.organizationID = organizationID;
+        this.donateHistoryList = donateHistoryList;
+        this.initTime = initTime;
+        this.endTime = endTime;
+        this.numberOfDonate = numberOfDonate;
+        this.isActive = isActive;
+        this.shortDesc = shortDesc;
+        this.longDesc = longDesc;
+    }
 }

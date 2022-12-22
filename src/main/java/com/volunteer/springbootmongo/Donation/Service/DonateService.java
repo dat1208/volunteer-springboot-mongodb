@@ -2,6 +2,7 @@ package com.volunteer.springbootmongo.Donation.Service;
 
 import com.google.api.Http;
 import com.volunteer.springbootmongo.Donation.Model.DonateHistory;
+import com.volunteer.springbootmongo.Donation.Model.DonateModel;
 import com.volunteer.springbootmongo.Donation.Request.RequireDonateRequest;
 import com.volunteer.springbootmongo.HDBank.Service.ValidateService;
 import com.volunteer.springbootmongo.HDBank.SpringWebClient.HDBankRequest.HDBankRequest;
@@ -37,7 +38,8 @@ public class DonateService {
     public ResponseObject donation_require(RequireDonateRequest donateRequest){
 
         String clientID = donateRequest.getClientID();
-        String fundID = donateRequest.getFundID();
+        String organizationID = donateRequest.getOrganizationID();
+        String postID = donateRequest.getPostID();
         Long amountDonate = Long.valueOf(donateRequest.getAmountDonate());
         String bankAccUsername = donateRequest.getBankAccUsername();
         String fromBankAccNo = donateRequest.getFromBankAccNo();
@@ -57,7 +59,8 @@ public class DonateService {
         }
         TransferRequestData transferRequestData = new TransferRequestData(fromBankAccNo,toBankAccNo,amountDonate.toString(),desc);
 
-        DonateHistory donateHistory = new DonateHistory();
+        DonateHistory donateHistory = new DonateHistory(clientID,organizationID,amountDonate.toString(),bankAccUsername,fromBankAccNo,toBankAccNo,"ok",desc);
+        DonateModel donateModel = new DonateModel();
         return new ResponseObject(HttpStatus.OK.toString(),hdBankRequest.transferHDBankAccount(new TransferRequest(request,transferRequestData)));
     }
 }

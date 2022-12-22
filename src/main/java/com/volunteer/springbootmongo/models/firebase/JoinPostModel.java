@@ -3,14 +3,14 @@ package com.volunteer.springbootmongo.models.firebase;
 import java.util.Date;
 
 public class JoinPostModel {
-    private String username;
     private Date date;
+
+    private String username;
 
     public JoinPostModel(String username, Date date) {
         this.username = username;
         this.date = date;
     }
-
     public JoinPostModel() {
     }
 
