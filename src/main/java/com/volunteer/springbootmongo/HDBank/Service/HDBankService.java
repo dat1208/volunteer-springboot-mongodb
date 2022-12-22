@@ -312,4 +312,23 @@ public class HDBankService implements HDBankUserInterface {
     public ResponseEntity<?> getBalance(AppsGetBalanceRequest appsGetBalanceRequest) {
         return null;
     }
+
+    public ResponseEntity<?> getAccount(String clientID) {
+        Optional<User> user =  userRepository.findById(clientID).stream().findFirst();
+        Map<String, Object> responseMessage = new HashMap<>();
+        responseMessage.put("clientID", clientID);
+        if(!(user == null)) {
+            if(!(user.get().getHdBankAccountList() == null)) {
+                HDBankAccount hdBankAccount = user.get().getHdBankAccountList().get(0);
+                responseMessage.put("hdBankAccountUsername", hdBankAccount.getHDBankUsername());
+                responseMessage.put("hdBankAccountAccNumber", hdBankAccount.getAccountNumber());
+                responseMessage.put("responseStatus", "SUCCESS");
+                responseMessage.put("message", "get_bank_account_success");
+                return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+            }
+        }
+        responseMessage.put("responseStatus", "FAILURE");
+        responseMessage.put("message", "get_bank_account_failure_account_not_linked_yet");
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
 }
