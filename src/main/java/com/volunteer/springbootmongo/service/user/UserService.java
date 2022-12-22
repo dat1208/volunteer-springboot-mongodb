@@ -379,4 +379,9 @@ public class UserService {
 
         return new ResponseObject(HttpStatus.OK.toString(),stories);
     }
+
+    public String getId(String owner) {
+        User user = userRepository.findUserByEmail(owner).get();
+        return user.get_id().toString();
+    }
 }
