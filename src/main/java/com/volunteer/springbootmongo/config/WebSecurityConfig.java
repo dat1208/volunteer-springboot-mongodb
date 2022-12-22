@@ -58,7 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests().antMatchers("/authenticate","/api/v1/users/register",
-                        "/api/v2/users/auth","/api/v1/users/auth").permitAll()
+                        "/api/v2/users/auth","/api/v1/users/auth","/api/firebase/post/getpost").permitAll()
                 // all other requests need to be authenticated
                 .anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to

@@ -5,19 +5,24 @@ import org.bson.types.ObjectId;
 import java.util.List;
 
 public class TNPost {
-    private List<String> listUsers;
+    private List<JoinPostModel> joinPostModel;
 
-    public List<String> getListUsers() {
-        return listUsers;
+    public TNPost(List<JoinPostModel> joinPostModel) {
+        this.joinPostModel = joinPostModel;
     }
 
-    public void setListUsers(List<String> listUsers) {
-        this.listUsers = listUsers;
-    }
-
-    public TNPost(List<String> listUsers) {
-        this.listUsers = listUsers;
-    }
     public TNPost() {
+
     }
+
+    public List<JoinPostModel> getJoinPostModel() {
+        return joinPostModel.stream().toList();
+    }
+
+
+
+    public void setJoinPostModel(List<JoinPostModel> joinPostModel) {
+        this.joinPostModel = joinPostModel;
+    }
+
 }

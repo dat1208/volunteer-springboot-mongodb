@@ -4,6 +4,8 @@ package com.volunteer.springbootmongo.service.firebase.post;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.type.DateTime;
+import com.volunteer.springbootmongo.models.firebase.JoinPostModel;
 import com.volunteer.springbootmongo.models.firebase.Post;
 import com.volunteer.springbootmongo.models.firebase.TNPost;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
@@ -19,9 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -68,31 +68,28 @@ public class PostService {
 
     public ResponseObject join(String idPost, HttpServletRequest request) throws Exception {
         String username = jwtUserDetailsService.getUsernameByToken(request);
+        JoinPostModel newJoin = new JoinPostModel(username, new Date());
+
         //Check user joined
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
-        List<String> listUsers = null;
-        try {
-            listUsers = tnpostDoc.get().get().toObject(TNPost.class).getListUsers();
-        } catch (Exception ex) {
-        }
-        if(listUsers != null)
-        {
-            for (String un :
-                    listUsers) {
-                if (un.equals(username))
-                    return new ResponseObject(HttpStatus.CONFLICT.toString(), "users_joined");
-            }
-            listUsers.add(username);
-            ApiFuture<WriteResult> future = tnpostDoc.update("listUsers", listUsers);
-        }
-        else if(listUsers == null){
-            List<String> initListUsers = new ArrayList<>();
-            initListUsers.add(username);
-            ApiFuture<WriteResult> future = tnpostDoc.update("listUsers", initListUsers);
-        }
+        List<JoinPostModel> joinPostModelList = new ArrayList<>();
+        joinPostModelList.add(newJoin);
+        joinPostModelList = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel();
+        if(joinPostModelList != null){
+            System.out.println(joinPostModelList.size());
+               for (JoinPostModel temp:
+                       joinPostModelList) {
+                   if (temp.getUsername().equals(username))
+                       return new ResponseObject(HttpStatus.CONFLICT.toString(), "user_joined");
+               }
 
-        return new ResponseObject(HttpStatus.OK.toString(), "successful");
+            ApiFuture<WriteResult> future = tnpostDoc.update("joinPostModel",joinPostModelList);
+        }
+        else {
+            System.out.println("null");
+        }
+        return new ResponseObject(HttpStatus.OK.toString(), joinPostModelList);
     }
     public ResponseObject getPostDetail(String name) throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
@@ -146,9 +143,9 @@ public class PostService {
     public int getCurrentUsers(String idPost) throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
-        List<String> listUsers = new ArrayList<>();
+        List<JoinPostModel> listUsers = new ArrayList<>();
         try {
-            listUsers = tnpostDoc.get().get().toObject(TNPost.class).getListUsers();
+            listUsers = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel();
         } catch(Exception ex) {
 
         }
@@ -160,10 +157,10 @@ public class PostService {
     public List<String> getAvtCurrentUsers(String idPost){
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
-        List<String> listUsers = new ArrayList<>();
+        List<JoinPostModel> listUsers = new ArrayList<>();
         List<String> listAvt = new ArrayList<>();
         try {
-            listUsers = tnpostDoc.get().get().toObject(TNPost.class).getListUsers();
+            listUsers = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel();
         } catch(Exception ex) {
 
         }
@@ -171,9 +168,9 @@ public class PostService {
         if (listUsers == null)
             return listAvt;
 
-        for (String user:
+        for (JoinPostModel model:
              listUsers) {
-            listAvt.add(userService.getAvatar(user));
+            listAvt.add(userService.getAvatar(model.getUsername()));
             if(listAvt.stream().count() >= 3)
                 break;
         }
