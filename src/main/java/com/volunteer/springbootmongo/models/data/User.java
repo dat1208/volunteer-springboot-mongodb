@@ -30,6 +30,7 @@ public class User {
     // List account HDBank (Kha)
     private List<HDBankAccount> hdBankAccountList;
 
+    private List<String> idActivitiesList;
     //List posts
     private List<String> posts;
 

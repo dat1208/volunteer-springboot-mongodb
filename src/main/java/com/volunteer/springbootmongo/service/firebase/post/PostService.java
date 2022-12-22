@@ -9,9 +9,12 @@ import com.volunteer.springbootmongo.Donation.Model.DonateHistory;
 import com.volunteer.springbootmongo.Donation.Model.DonateModel;
 import com.volunteer.springbootmongo.Donation.Repository.DonateRepository;
 import com.volunteer.springbootmongo.models.firebase.JoinPostModel;
+import com.volunteer.springbootmongo.models.data.User;
+import com.volunteer.springbootmongo.models.firebase.JoinPostModelCollection;
 import com.volunteer.springbootmongo.models.firebase.Post;
 import com.volunteer.springbootmongo.models.firebase.TNPost;
 import com.volunteer.springbootmongo.models.response.ResponseObject;
+import com.volunteer.springbootmongo.repository.UserRepository;
 import com.volunteer.springbootmongo.service.firebase.upoad.UploadService;
 import com.volunteer.springbootmongo.service.jwt.JwtUserDetailsService;
 import com.volunteer.springbootmongo.service.user.UserService;
@@ -25,6 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -37,9 +44,12 @@ public class PostService {
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
+
 
     @Autowired
     private DonateRepository donateRepository;
@@ -83,28 +93,50 @@ public class PostService {
     }
 
     public ResponseObject join(String idPost, HttpServletRequest request) throws Exception {
+
         String username = jwtUserDetailsService.getUsernameByToken(request);
-        JoinPostModel newJoin = new JoinPostModel(username,new Date());
+        JoinPostModel newJoin = new JoinPostModel(username, new Date());
 
         //Check user joined
         Firestore dbFileStore = FirestoreClient.getFirestore();
-        DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
-        ApiFuture<DocumentSnapshot> future = tnpostDoc.get();
+        DocumentReference tnPostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
+
+        ApiFuture<DocumentSnapshot> future = tnPostDoc.get();
         DocumentSnapshot documentSnapshot = future.get();
-        Object joinPostModelList = documentSnapshot.get("joinPostModel");
-        List<JoinPostModel> list = (List<JoinPostModel>) joinPostModelList;
 
+        JoinPostModelCollection joinPostModelCollection = documentSnapshot.toObject(JoinPostModelCollection.class);
 
-        if(list != null){
-            for (JoinPostModel value:
-                 list) {
-                if(value.getUsername().equals(username))
-                    return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.name(), "user_joined");
+        if (joinPostModelCollection.getJoinPostModelList() != null) {
+            for (JoinPostModel value : joinPostModelCollection.getJoinPostModelList()) {
+                if (value.getUsername().equals(username))
+                    return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.name(), "JOIN_FAIL");
             }
-            ApiFuture<WriteResult> apiFuture = tnpostDoc.set(list);
+            joinPostModelCollection.getJoinPostModelList().add(newJoin);
+            tnPostDoc.update("joinPostModel",joinPostModelCollection);
+        } else {
+            JoinPostModelCollection newJoinPostModelCollection = new JoinPostModelCollection();
+            List<JoinPostModel> list = new ArrayList<>();
+            list.add(newJoin);
+            newJoinPostModelCollection.setJoinPostModelList(list);
+            ApiFuture<WriteResult> apiFuture = tnPostDoc.set(newJoinPostModelCollection);
         }
-        return new ResponseObject(HttpStatus.OK.toString(),list);
+
+        try {
+            User user = userRepository.findUserByEmail(username).get();
+            if (user.getIdActivitiesList() == null) {
+                List<String> activitiesList = new ArrayList<>();
+                activitiesList.add(idPost);
+                user.setIdActivitiesList(activitiesList);
+            } else {
+                user.getIdActivitiesList().add(idPost);
+            }
+            userRepository.save(user);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+        return new ResponseObject(HttpStatus.OK.toString(), "JOIN_OK");
     }
+
     public ResponseObject getPostDetail(String name) throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference documentReference = dbFileStore.collection(COLLECTION_NAME_POST).document(name);
