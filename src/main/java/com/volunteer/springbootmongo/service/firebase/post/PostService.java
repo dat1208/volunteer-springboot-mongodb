@@ -135,60 +135,47 @@ public class PostService {
     public void addCollectionTNPost(String id){
 
         Firestore dbFileStore = FirestoreClient.getFirestore();
-        List<String> listUsers = new ArrayList<>();
-        TNPost tnPost = new TNPost();
+        List<JoinPostModel> modelList = new ArrayList<>();
+        TNPost tnPost = new TNPost(modelList);
         ApiFuture<WriteResult> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(id).create(tnPost);
 
     }
     public int getCurrentUsers(String idPost) throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
-        List<JoinPostModel> listUsers = new ArrayList<>();
+        List<JoinPostModel> modelList = new ArrayList<>();
+        TNPost tnPost = new TNPost(modelList);
         try {
-            listUsers = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel();
+            modelList = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel().stream().toList();
+            tnPost.setJoinPostModel(modelList);
         } catch(Exception ex) {
 
         }
-
-        if (listUsers == null)
-            return 0;
-        return (int) listUsers.stream().count();
+        System.out.println(modelList.stream().count());
+        return (int) tnPost.getJoinPostModel().stream().count();
     }
     public List<String> getAvtCurrentUsers(String idPost){
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
-        List<JoinPostModel> listUsers = new ArrayList<>();
+        List<JoinPostModel> modelList = new ArrayList<>();
+
         List<String> listAvt = new ArrayList<>();
         try {
-            listUsers = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel();
+            modelList = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel().stream().toList();
         } catch(Exception ex) {
 
         }
 
-        if (listUsers == null)
+        if (modelList == null)
             return listAvt;
 
         for (JoinPostModel model:
-             listUsers) {
+                modelList) {
             listAvt.add(userService.getAvatar(model.getUsername()));
             if(listAvt.stream().count() >= 3)
                 break;
         }
         return listAvt;
-    }
-    public List<Post> getAll() throws ExecutionException, InterruptedException {
-        Firestore dbFileStore = FirestoreClient.getFirestore();
-        CollectionReference posts = dbFileStore.collection(COLLECTION_NAME_POST);
-        List<Post> listPost = posts.get().get().toObjects(Post.class).stream().toList();
-        for (Post post:listPost) {
-            if(post.getDatecreated() != null)
-            post.setTimeago(calTimeAgo(Long.valueOf((post.getDatecreated()))));
-            if(post.getType().equals(Post.type.TN)){
-                post.setCurrentUsers(getCurrentUsers(post.getId()));
-                post.setAvtCurrentUsers(getAvtCurrentUsers(post.getId()));
-            }
-        }
-        return  listPost;
     }
 
     public List<Post> getpost(int limit, int begin) throws ExecutionException, InterruptedException {
