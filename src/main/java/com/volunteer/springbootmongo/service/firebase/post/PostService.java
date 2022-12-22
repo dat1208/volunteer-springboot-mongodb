@@ -5,6 +5,9 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.type.DateTime;
+import com.volunteer.springbootmongo.Donation.Model.DonateHistory;
+import com.volunteer.springbootmongo.Donation.Model.DonateModel;
+import com.volunteer.springbootmongo.Donation.Repository.DonateRepository;
 import com.volunteer.springbootmongo.models.firebase.JoinPostModel;
 import com.volunteer.springbootmongo.models.data.User;
 import com.volunteer.springbootmongo.models.firebase.JoinPostModelCollection;
@@ -47,33 +50,46 @@ public class PostService {
     @Autowired
     private UserService userService;
 
-    public ResponseObject savePost(Post post, MultipartFile file, HttpServletRequest request) throws Exception {
-        Firestore dbFileStore = FirestoreClient.getFirestore();
-        ApiFuture<DocumentReference> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME_POST).add(post);
-        String username = jwtUserDetailsService.getUsernameByToken(request);
-        String id = collectionApiFuture.get().getId();
-        String url = uploadService.uploadPostImage(file, id);
-        post.setMainimage(url);
-        post.setId(id);
-        Long dateTime = System.currentTimeMillis();
-        post.setDatecreated(dateTime.toString());
-        post.setOwner(username);
-        post.setAvtOwner(userService.getAvatar(username));
-        post.setNameOwner(userService.getUserByUsername(username).getFirstname() + " " + userService.getUserByUsername(username).getLastname());
-        if (post.getType().equals(Post.type.TN) && post.getTotalUsers() == 0)
-            return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "TN post need totalUsers");
-        if (post.getType().equals(Post.type.QG) && post.getTotalMoney() == 0)
-            return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "QG post need totalMoney");
-        if (post.getType().equals(Post.type.HP) && post.getTotalMoney() == 0)
-            return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "HP post need totalMoney");
-        collectionApiFuture.get().set(post);
-        //Append post to users
 
-        userService.insertPost(id, username);
-        //Create collection to save users join TN post
-        if (post.getType().equals(Post.type.TN))
+    @Autowired
+    private DonateRepository donateRepository;
+
+    public ResponseObject savePost(Post post, MultipartFile file, HttpServletRequest request) throws Exception {
+      Firestore dbFileStore = FirestoreClient.getFirestore();
+      ApiFuture<DocumentReference> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME_POST).add(post);
+      String username = jwtUserDetailsService.getUsernameByToken(request);
+      String id = collectionApiFuture.get().getId();
+      String url = uploadService.uploadPostImage(file,id);
+          post.setMainimage(url);
+          post.setId(id);
+          Long dateTime = System.currentTimeMillis();
+          post.setDatecreated(dateTime.toString());
+          post.setOwner(username);
+          post.setAvtOwner(userService.getAvatar(username));
+          post.setNameOwner(userService.getUserByUsername(username).getFirstname()+" "+userService.getUserByUsername(username).getLastname());
+      if(post.getType().equals(Post.type.TN) && post.getTotalUsers() == 0)
+          return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "TN post need totalUsers");
+      if(post.getType().equals(Post.type.QG)  && post.getTotalMoney() == 0)
+            return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "QG post need totalMoney");
+      if(post.getType().equals(Post.type.HP) && post.getTotalMoney() == 0)
+          return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.toString(), "HP post need totalMoney");
+      collectionApiFuture.get().set(post);
+      //Append post to users
+
+      userService.insertPost(id,username);
+      //Create collection to save users join TN post
+      if(post.getType().equals(Post.type.TN))
             addCollectionTNPost(id);
-        return new ResponseObject(HttpStatus.CREATED.toString(), post);
+
+      if(post.getType().equals(Post.type.QG))
+          {
+              DonateModel donateModel = new DonateModel(id,username,post.getDateStart(),post.getDateEnd(),true,post.getTitle(),post.getContent());
+              donateModel.set_id(id);
+              donateRepository.save(donateModel);
+          }
+
+
+      return new ResponseObject(HttpStatus.CREATED.toString(),post);
     }
 
     public ResponseObject join(String idPost, HttpServletRequest request) throws Exception {
@@ -128,44 +144,41 @@ public class PostService {
         DocumentSnapshot document = future.get();
 
         Post post = null;
-        if (document.exists()) {
+        if(document.exists()){
             post = document.toObject(Post.class);
             String dateTimeConverted = convertMilisToGMT7((Long.parseLong(post.getDatecreated())));
             String timeAgo = calTimeAgo(Long.parseLong(post.getDatecreated()));
             post.setDatecreated(dateTimeConverted);
             post.setTimeago(timeAgo);
-            return new ResponseObject(HttpStatus.FOUND.toString(), post);
-        } else {
-            return new ResponseObject(HttpStatus.NOT_FOUND.toString(), null);
+            return new ResponseObject(HttpStatus.FOUND.toString(),post);
+        }else {
+            return new ResponseObject(HttpStatus.NOT_FOUND.toString(),null);
         }
 
     }
-
-    public String convertMilisToGMT7(Long milisecond) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm:ss z");
+    public String convertMilisToGMT7(Long milisecond){
+        SimpleDateFormat formatter= new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm:ss z");
         formatter.setTimeZone(TimeZone.getTimeZone("GMT+7"));
 
         return formatter.format(milisecond).toString();
     }
-
-    public String calTimeAgo(Long milis) {
+    public String calTimeAgo(Long milis){
 
 
         Long currentTimeMillis = System.currentTimeMillis();
         Long result = (currentTimeMillis - milis);
 
-        if (result < 60000) {
-            return result / 1000 + " giây trước";
-        } else if (result < 3600000) {
-            return result / 1000 / 60 + " phút trước";
-        } else if (result < 86400000) {
-            return result / 1000 / 60 / 60 + " giờ trước";
-        } else if (result < 2592000000L) {
-            return result / 1000 / 60 / 24 + " ngày trước";
-        } else return result / 1000 / 60 / 24 / 365 + " năm trước";
+        if(result < 60000){
+            return result/1000+" giây trước";
+        } else if(result < 3600000){
+            return result/1000/60+" phút trước";
+        } else if(result < 86400000){
+            return result/1000/60/60+" giờ trước";
+        } else if(result < 2592000000L){
+            return result/1000/60/24 +" ngày trước";
+        } else return result/1000/60/24/365 +" năm trước";
     }
-
-    public void addCollectionTNPost(String id) {
+    public void addCollectionTNPost(String id){
 
         Firestore dbFileStore = FirestoreClient.getFirestore();
         List<JoinPostModel> modelList = new ArrayList<>();
@@ -173,7 +186,6 @@ public class PostService {
         ApiFuture<WriteResult> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(id).create(tnPost);
 
     }
-
     public int getCurrentUsers(String idPost) throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
@@ -182,14 +194,13 @@ public class PostService {
         try {
             modelList = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel().stream().toList();
             tnPost.setJoinPostModel(modelList);
-        } catch (Exception ex) {
+        } catch(Exception ex) {
 
         }
         System.out.println(modelList.stream().count());
         return (int) tnPost.getJoinPostModel().stream().count();
     }
-
-    public List<String> getAvtCurrentUsers(String idPost) {
+    public List<String> getAvtCurrentUsers(String idPost){
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
         List<JoinPostModel> modelList = new ArrayList<>();
@@ -197,47 +208,60 @@ public class PostService {
         List<String> listAvt = new ArrayList<>();
         try {
             modelList = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel().stream().toList();
-        } catch (Exception ex) {
+        } catch(Exception ex) {
 
         }
 
         if (modelList == null)
             return listAvt;
 
-        for (JoinPostModel model :
+        for (JoinPostModel model:
                 modelList) {
             listAvt.add(userService.getAvatar(model.getUsername()));
-            if (listAvt.stream().count() >= 3)
+            if(listAvt.stream().count() >= 3)
                 break;
         }
         return listAvt;
     }
-/*
-* change: GET post then response data isJoined Activities: */
+
     public List<Post> getpost(int limit, int begin) throws ExecutionException, InterruptedException {
         Firestore dbFileStore = FirestoreClient.getFirestore();
         CollectionReference posts = dbFileStore.collection(COLLECTION_NAME_POST);
-        CollectionReference TNPost = dbFileStore.collection(COLLECTION_NAME_TNPOST);
         List<Post> listPost = posts.get().get().toObjects(Post.class).stream().toList();
-
-        for (Post post : listPost) {
-            if (post.getDatecreated() != null)
+        for (Post post:listPost) {
+            if(post.getDatecreated() != null)
                 post.setTimeago(calTimeAgo(Long.valueOf((post.getDatecreated()))));
-            if (post.getType().equals(Post.type.TN)) {
+            if(post.getType().equals(Post.type.TN)){
                 post.setCurrentUsers(getCurrentUsers(post.getId()));
                 post.setAvtCurrentUsers(getAvtCurrentUsers(post.getId()));
             }
+            if(post.getType().equals(Post.type.QG)){
+                post.setCurrentMoney(getCurrentMoney(post.getId()));
+            }
+            post.setIdOwner(userService.getId(post.getOwner()));
         }
-        if (listPost.size() < begin || listPost.size() < begin + limit)
+        if(listPost.size() < begin || listPost.size() < begin+limit)
             return listPost;
         else {
             List<Post> listlimit = new ArrayList<>();
             int count = 0;
 
-            for (int i = begin; i < begin + limit; i++) {
+            for (int i = begin; i < begin+limit; i++) {
                 listlimit.add(listPost.get(i));
             }
             return listlimit;
         }
+    }
+
+    private int getCurrentMoney(String id) {
+        int total = 0;
+        if(donateRepository.findDonateModelBy_id(id).isPresent()) {
+            DonateModel donateModel = donateRepository.findDonateModelBy_id(id).get();
+            List<DonateHistory> donateHistoryList = donateModel.getDonateHistoryList();
+            for (DonateHistory d : donateHistoryList) {
+                total += Integer.parseInt(d.getAmountDonate());
+            }
+        }
+        return total;
     }
 }

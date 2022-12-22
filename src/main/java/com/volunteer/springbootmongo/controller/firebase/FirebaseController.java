@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -25,6 +26,8 @@ public class FirebaseController {
     @PostMapping("/post")
     public ResponseObject savePost(@RequestParam("file") MultipartFile file,
                                    @RequestParam(name = "title") String title,
+                                   @RequestParam(name = "dateStart",required = false) Date dateStart,
+                                   @RequestParam(name = "dateEnd",required = false) Date dateEnd,
                                    @RequestParam(name = "content") String content,
                                    @RequestParam(name = "subtitle",required = false) String subtitle,
                                    @RequestParam(name = "type") Post.type type,
@@ -32,7 +35,7 @@ public class FirebaseController {
                                    @RequestParam(name = "totalUsers",required = false,defaultValue = "0") int totalUsers,
                                    @RequestParam(name = "totalMoney",required = false,defaultValue = "0") int totalMoney, HttpServletRequest request) throws Exception {
 
-        return postService.savePost(new Post(content,title,subtitle,address, type,totalMoney,totalUsers),file,request);
+        return postService.savePost(new Post(content,title,subtitle,dateStart,dateEnd,address, type,totalMoney,totalUsers),file,request);
     }
 
     @GetMapping("/post/{name}")

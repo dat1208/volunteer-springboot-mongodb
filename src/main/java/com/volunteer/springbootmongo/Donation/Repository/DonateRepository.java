@@ -1,8 +1,6 @@
 package com.volunteer.springbootmongo.Donation.Repository;
 
 import com.volunteer.springbootmongo.Donation.Model.DonateModel;
-import com.volunteer.springbootmongo.models.data.User;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
@@ -12,5 +10,5 @@ import java.util.Optional;
  * @project volunteer-springboot-mongodb
  */
 public interface DonateRepository extends MongoRepository<DonateModel,String>{
-    Optional<DonateModel> findDonateModelBy_id(ObjectId _id);
+    Optional<DonateModel> findDonateModelBy_id(String _id);
 }

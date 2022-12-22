@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -14,11 +15,17 @@ public class Post {
 
     private String Owner;
 
+    private String idOwner;
+
     private String nameOwner;
     private String avtOwner;
     private String id;
     private String content;
     private String datecreated;
+
+    private Date dateStart;
+
+    private Date dateEnd;
     private String title;
     private String subtitle;
     private String mainimage;
@@ -173,6 +180,14 @@ public class Post {
         this.mainimage = mainimage;
     }
 
+    public String getIdOwner() {
+        return idOwner;
+    }
+
+    public void setIdOwner(String idOwner) {
+        this.idOwner = idOwner;
+    }
+
     public Post(String content, String title, String subtitle, String address ) {
         this.content = content;
         this.title = title;
@@ -181,7 +196,7 @@ public class Post {
         this.type = type;
     }
 
-    public Post(String content, String title, String subtitle, String address, Post.type type, int totalMoney, int totalUsers) {
+    public Post(String content, String title, String subtitle,Date dateStart,Date dateEnd ,String address, Post.type type, int totalMoney, int totalUsers) {
         this.content = content;
         this.title = title;
         this.subtitle = subtitle;
@@ -189,6 +204,8 @@ public class Post {
         this.type = type;
         this.totalMoney = totalMoney;
         this.totalUsers = totalUsers;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
     }
 
     public Post() {}
