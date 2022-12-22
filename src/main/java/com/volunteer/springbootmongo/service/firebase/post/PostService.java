@@ -75,26 +75,24 @@ public class PostService {
 
     public ResponseObject join(String idPost, HttpServletRequest request) throws Exception {
         String username = jwtUserDetailsService.getUsernameByToken(request);
-        JoinPostModel newJoin = new JoinPostModel(username, new Date());
+        JoinPostModel newJoin = new JoinPostModel(username,new Date());
 
         //Check user joined
         Firestore dbFileStore = FirestoreClient.getFirestore();
         DocumentReference tnpostDoc = dbFileStore.collection(COLLECTION_NAME_TNPOST).document(idPost);
-        List<JoinPostModel> joinPostModelList = new ArrayList<>();
-        joinPostModelList.add(newJoin);
-        joinPostModelList = tnpostDoc.get().get().toObject(TNPost.class).getJoinPostModel();
-        if(joinPostModelList != null){
-            System.out.println(joinPostModelList.size());
-               for (JoinPostModel temp:
-                       joinPostModelList) {
-                   if (temp.getUsername().equals(username))
-                       return new ResponseObject(HttpStatus.CONFLICT.toString(), "user_joined");
-               }
+        ApiFuture<DocumentSnapshot> future = tnpostDoc.get();
+        DocumentSnapshot documentSnapshot = future.get();
+        Object joinPostModelList = documentSnapshot.get("joinPostModel");
+        List<JoinPostModel> list = (List<JoinPostModel>) joinPostModelList;
 
-            ApiFuture<WriteResult> future = tnpostDoc.update("joinPostModel",joinPostModelList);
-        }
-        else {
-            System.out.println("null");
+
+        if(list != null){
+            for (JoinPostModel value:
+                 list) {
+                if(value.getUsername().equals(username))
+                    return new ResponseObject(HttpStatus.NOT_ACCEPTABLE.name(), "user_joined");
+            }
+            ApiFuture<WriteResult> apiFuture = tnpostDoc.set(list);
         }
         // Store IDPost to userIN Mongo DB;
         try {
