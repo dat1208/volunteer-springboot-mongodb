@@ -31,5 +31,4 @@ public class DonateController {
         return donateService.donation_require(donateRequest);
     }
 
-
 }
