@@ -5,6 +5,9 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.type.DateTime;
+import com.volunteer.springbootmongo.Donation.Model.DonateHistory;
+import com.volunteer.springbootmongo.Donation.Model.DonateModel;
+import com.volunteer.springbootmongo.Donation.Repository.DonateRepository;
 import com.volunteer.springbootmongo.models.firebase.JoinPostModel;
 import com.volunteer.springbootmongo.models.firebase.Post;
 import com.volunteer.springbootmongo.models.firebase.TNPost;
@@ -37,6 +40,10 @@ public class PostService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private DonateRepository donateRepository;
+
     public ResponseObject savePost(Post post, MultipartFile file, HttpServletRequest request) throws Exception {
       Firestore dbFileStore = FirestoreClient.getFirestore();
       ApiFuture<DocumentReference> collectionApiFuture = dbFileStore.collection(COLLECTION_NAME_POST).add(post);
@@ -63,6 +70,15 @@ public class PostService {
       //Create collection to save users join TN post
       if(post.getType().equals(Post.type.TN))
             addCollectionTNPost(id);
+
+      if(post.getType().equals(Post.type.QG))
+          {
+              DonateModel donateModel = new DonateModel(id,username,post.getDateStart(),post.getDateEnd(),true,post.getTitle(),post.getContent());
+              donateModel.set_id(id);
+              donateRepository.save(donateModel);
+          }
+
+
       return new ResponseObject(HttpStatus.CREATED.toString(),post);
     }
 
@@ -187,6 +203,9 @@ public class PostService {
                 post.setCurrentUsers(getCurrentUsers(post.getId()));
                 post.setAvtCurrentUsers(getAvtCurrentUsers(post.getId()));
             }
+            if(post.getType().equals(Post.type.QG)){
+                post.setCurrentMoney(getCurrentMoney(post.getId()));
+            }
         }
         if(listPost.size() < begin || listPost.size() < begin+limit)
             return listPost;
@@ -199,5 +218,17 @@ public class PostService {
             }
             return listlimit;
         }
+    }
+
+    private int getCurrentMoney(String id) {
+        int total = 0;
+        if(donateRepository.findDonateModelBy_id(id).isPresent()) {
+            DonateModel donateModel = donateRepository.findDonateModelBy_id(id).get();
+            List<DonateHistory> donateHistoryList = donateModel.getDonateHistoryList();
+            for (DonateHistory d : donateHistoryList) {
+                total += Integer.parseInt(d.getAmountDonate());
+            }
+        }
+        return total;
     }
 }

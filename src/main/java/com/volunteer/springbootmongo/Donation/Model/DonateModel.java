@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Document("DonateModel")
 public class DonateModel {
-    private ObjectId _id;
+    private String _id;
     private String postID;
     private String organizationID;
     private List<DonateHistory> donateHistoryList = new ArrayList<>();
@@ -30,13 +30,11 @@ public class DonateModel {
     private String shortDesc;
     private String longDesc;
 
-    public DonateModel(String postID, String organizationID, List<DonateHistory> donateHistoryList, Date initTime, Date endTime, int numberOfDonate, boolean isActive, String shortDesc, String longDesc) {
+    public DonateModel(String postID, String organizationID, Date initTime, Date endTime, boolean isActive, String shortDesc, String longDesc) {
         this.postID = postID;
         this.organizationID = organizationID;
-        this.donateHistoryList = donateHistoryList;
         this.initTime = initTime;
         this.endTime = endTime;
-        this.numberOfDonate = numberOfDonate;
         this.isActive = isActive;
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
