@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class RequireDonateRequest {
     private String clientID;
-    private String fundID;
+    private String organizationID;
+    private String postID;
     private String amountDonate;
     private String bankAccUsername;
     private String fromBankAccNo;
