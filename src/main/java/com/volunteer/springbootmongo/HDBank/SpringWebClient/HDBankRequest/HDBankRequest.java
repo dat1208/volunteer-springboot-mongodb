@@ -92,7 +92,7 @@ public class HDBankRequest implements HDBankRequestInterface {
                     return response.getBody().getData().getAccountNo();
                 }
             } else if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                //TODO: Đạt Run new request
+                System.out.println("UNAUTHORIZED");
             }
         } catch (Exception ex) {
             System.out.println("Link HDBank Account Ex: " + ex);

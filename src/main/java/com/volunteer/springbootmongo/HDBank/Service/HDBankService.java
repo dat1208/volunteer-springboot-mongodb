@@ -135,7 +135,7 @@ public class HDBankService implements HDBankUserInterface {
                 ResponseMessage.put("message", Message.current_user_is_limit_link_bank_account);
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage);
             }
-            if (!validateService.isExistLinked(AppsLoginRequestData.getClientID(), AccountNo)) {
+            if (validateService.isExistLinked(AppsLoginRequestData.getClientID(), AccountNo)) {
                 ResponseMessage.put("message", Message.this_HDBank_account_linked_please_choose_another_account);
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage);
             }

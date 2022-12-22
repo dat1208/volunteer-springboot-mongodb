@@ -27,4 +27,15 @@ public class DonateHistory {
     private String toBankAccNo;
     private String status;
     private String desc;
+
+    public DonateHistory(String clientID, String organizationID, String amountDonate, String bankAccUsername, String fromBankAccNo, String toBankAccNo, String status, String desc) {
+        this.clientID = clientID;
+        this.organizationID = organizationID;
+        this.amountDonate = amountDonate;
+        this.bankAccUsername = bankAccUsername;
+        this.fromBankAccNo = fromBankAccNo;
+        this.toBankAccNo = toBankAccNo;
+        this.status = status;
+        this.desc = desc;
+    }
 }
