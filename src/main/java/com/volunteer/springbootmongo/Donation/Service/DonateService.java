@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -81,6 +83,13 @@ public class DonateService {
             List<DonateHistory> donateHistoryList = donateModel.getDonateHistoryList();
             donateHistoryList.add(donateHistory);
             donateModel.setDonateHistoryList(donateHistoryList);
+            donateRepository.save(donateModel);
+        }
+        else {
+            List<DonateHistory> donateHistoryList = new ArrayList<>();
+            donateHistoryList.add(donateHistory);
+            DonateModel donateModel = new DonateModel(postID,null,new Date(),null,true,desc,wishMessage);
+            donateModel.set_id(postID);
             donateRepository.save(donateModel);
         }
         return new ResponseObject(HttpStatus.OK.toString(),hdBankRequest.transferHDBankAccount(new TransferRequest(request,transferRequestData)).getBody());
