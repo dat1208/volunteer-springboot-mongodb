@@ -46,5 +46,9 @@ public class HDBankController {
         return hdBankService.getBalance(appsGetBalanceRequest);
     }
 
+    @PostMapping("/get-account")
+    public ResponseEntity<?> getAccount(@RequestParam String clientID) {
+        return hdBankService.getAccount(clientID);
+    }
 
 }
