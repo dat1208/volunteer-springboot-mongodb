@@ -90,6 +90,7 @@ public class DonateService {
             donateHistoryList.add(donateHistory);
             DonateModel donateModel = new DonateModel(postID,null,new Date(),null,true,desc,wishMessage);
             donateModel.set_id(postID);
+            donateModel.setDonateHistoryList(donateHistoryList);
             donateRepository.save(donateModel);
         }
         return new ResponseObject(HttpStatus.OK.toString(),hdBankRequest.transferHDBankAccount(new TransferRequest(request,transferRequestData)).getBody());
